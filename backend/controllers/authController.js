@@ -96,4 +96,27 @@ const authUser = async (req, res) => {
     }
 };
 
-module.exports = { registerUser, authUser };
+const getMe = async (req, res) => {
+    if (req.user) {
+        res.json({
+            _id: req.user._id,
+            name: req.user.name,
+            email: req.user.email,
+            isAdmin: req.user.isAdmin
+        });
+    } else {
+        res.status(404).json({ message: "Usuario nao encontrado" });
+    }
+};
+
+const logoutUser = async (req, res) => {
+    res.cookie('token', '', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        expires: new Date(0),
+    });
+    res.status(200).json({ message: 'Deslogado com sucesso' });
+};
+
+module.exports = { registerUser, authUser, getMe, logoutUser };
