@@ -1,13 +1,21 @@
 const Cart = require("../models/Cart");
+const { populate } = require("../models/Category");
 const Product = require("../models/Product");
+const mongoose = require("mongoose");
+
+const populateCartItems = async (query) => {
+  return query.populate({
+    path: "items.product",
+    populate: { path: "category", select: "name" },
+  });
+};
 
 const getCart = async (req, res) => {
   try {
-    let cart = await Cart.findOne({ user: req.user._id }).populate(
-      "items.product"
-    );
+    let cart = await populateCartItems(Cart.findOne({ user: req.user._id }));
     if (!cart) {
       cart = await Cart.create({ user: req.user._id, items: [] });
+      cart = await populateCartItems(Cart.findOne({ user: req.user._id }));
     }
     res.json(cart);
   } catch (error) {
@@ -18,6 +26,15 @@ const getCart = async (req, res) => {
 const addToCart = async (req, res) => {
   try {
     const { productId, quantity } = req.body;
+
+    if (typeof quantity !== "number" || quantity < 1) {
+      return res.status(400).json({ message: "Quantidade invalida" });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res.status(400).json({ message: "Produto invalido" });
+    }
+
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ message: "Produto nao encontrado" });
@@ -37,36 +54,67 @@ const addToCart = async (req, res) => {
     }
 
     await cart.save();
-    res.json(cart);
+
+    const populatedCart = await populateCartItems(
+      Cart.findOne({ user: req.user._id })
+    );
+
+    if (!populatedCart) {
+      return res.status(500).json({
+        message: "Erro ao adicionar ao carrinho após adicionar e popular",
+      });
+    }
+
+    res.json(populatedCart);
   } catch (error) {
-    res.status(500).json({ message: "Erro ao adicionar ao carrinho" });
+    console.error("Erro ao adicionar ao carrinho:", error);
+    res
+      .status(500)
+      .json({ message: "Erro ao adicionar ao carrinho", error: error.message });
   }
 };
 
 const updateCartItem = async (req, res) => {
-    const { productId, quantity } = req.body;
+  const { productId, quantity } = req.body;
+
+  if (typeof quantity !== "number" || quantity < 0) {
+    return res.status(400).json({
+      message: "Quantidade invalida. Deve ser um numero maior ou igual a zero",
+    });
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(productId)) {
+    return res.status(400).json({ message: "ID do Produto invalido" });
+  }
 
   try {
     const cart = await Cart.findOne({ user: req.user._id });
     if (!cart) {
       return res.status(404).json({ message: "Carrinho nao encontrado" });
     }
-    const item = cart.items.find(
+    const itemIndex = cart.items.findIndex(
       (item) => item.product.toString() === productId
     );
-    if (!item) {
-      return res.status(404).json({ message: "Item nao encontrado no carrinho" });
+
+    if (itemIndex === -1) {
+      return res
+        .status(404)
+        .json({ message: "Item nao encontrado no carrinho" });
     }
     if (quantity <= 0) {
-      cart.items = cart.items.filter(
-        (item) => item.product.toString() !== productId
-      );
+      cart.items.splice(itemIndex, 1);
     } else {
-      item.quantity = quantity;
+      cart.items[itemIndex].quantity = quantity;
     }
     await cart.save();
-    res.json(cart);
+
+    const populatedCart = await populateCartItems(
+      Cart.findOne({ user: req.user._id })
+    );
+
+    res.json(populatedCart);
   } catch (error) {
+    console.error("Erro ao atualizar item do carrinho:", error);
     res.status(500).json({ message: "Erro ao atualizar item do carrinho" });
   }
 };
@@ -74,17 +122,33 @@ const updateCartItem = async (req, res) => {
 const removeFromCart = async (req, res) => {
   try {
     const { productId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res.status(400).json({ message: "ID do Produto invalido" });
+    }
+
     const cart = await Cart.findOne({ user: req.user._id });
     if (!cart) {
       return res.status(404).json({ message: "Carrinho nao encontrado" });
     }
+
+    const initialItemCount = cart.items.length;
+
     cart.items = cart.items.filter(
       (item) => item.product.toString() !== productId
     );
+
+    if (cart.items.length === initialItemCount) {
+      return res.status(404).json({ message: "Item nao encontrado no carrinho" });
+    }
+
     await cart.save();
-    res.json(cart);
+
+     const populateCart = await populateCartItems(Cart.findOne({ user: req.user._id }));
+
+    res.json(populateCart);
   } catch (error) {
-    console.error(error);
+    console.error("Erro ao remover do carrinho:", error);
     res.status(500).json({ message: "Erro ao remover do carrinho" });
   }
 };
@@ -93,12 +157,16 @@ const clearCart = async (req, res) => {
   try {
     const cart = await Cart.findOne({ user: req.user._id });
     if (!cart) {
-      return res.status(404).json({ message: "Carrinho nao encontrado" });
+      return res.status(200).json({ user: req.user._id, items: [] });
     }
     cart.items = [];
     await cart.save();
-    res.json(cart);
+
+    const populateCart = await populateCartItems(Cart.findOne({ user: req.user._id }));
+
+    res.json(populateCart);
   } catch (error) {
+    console.error("Erro ao limpar carrinho:", error);
     res.status(500).json({ message: "Erro ao limpar carrinho" });
   }
 };

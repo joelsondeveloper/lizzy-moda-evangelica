@@ -16,7 +16,7 @@ const registerUser = async (req, res) => {
 
     try {
         const normalizedEmail = email.toLowerCase();
-        const userExists = await User.findOne({ email });
+        const userExists = await User.findOne({ email: normalizedEmail });
 
         if (userExists) {
             return res.status(400).json({ message: 'Usuario ja cadastrado' });
