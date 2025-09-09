@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
 
   --color-page-background-light: #F8ECF0;
@@ -8,7 +10,7 @@
   
   --color-primary-accent-light: #8C2D4B;
   --color-button-text-light: #FFFFFF;
-  --color-link-light: #8C2D4B;
+  --color-link-light: #FCE7F3;
 
   
   --color-text-primary-light: #333333;
@@ -24,7 +26,7 @@
 
 
   
-  --color-page-background-dark: #1A1A2E;
+  --color-page-background-dark: #1E293B;
   --color-card-background-dark: #282840;
 
 
@@ -43,4 +45,7 @@
  
   --color-success-dark: #66BB6A;
   --color-error-dark: #EF5350;
+
+  --font-inter: "Inter", sans-serif;
+  --font-playfair: "Playfair Display", serif;
 }
