@@ -4,46 +4,27 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
-
 import Form from "@/components/layouts/layouts/Form";
 import GroupForm from "@/components/layouts/ui/GroupForm";
 import Register from "@/components/layouts/ui/register";
 
 const Page = () => {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
   const [error, setError] = useState<string | null>(null);
   const [formLoading, setFormLoading] = useState(false);
 
-
-  const { login, isAuthenticated, isAdmin, isLoading: authLoading } = useAuth();
+  const {
+    register,
+    isAuthenticated,
+    isAdmin,
+    isLoading: authLoading,
+  } = useAuth();
 
   const router = useRouter();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setFormLoading(true);
-
-    if (!email || !password) {
-      setError("Preencha todos os campos.");
-      toast.error("Preencha todos os campos.");
-      setFormLoading(false);
-      return;
-    }
-
-    try {
-      await login({ email, password });
-      toast.success("Login realizado com sucesso!, seja bem vindo!");
-      router.push("/");
-    } catch (err: string | any) {
-      setError(err.response?.data?.message || "Email ou senha incorretos.");
-      toast.error(error);
-      console.error("Erro no login:", err);
-    } finally {
-      setFormLoading(false);
-    }
-  };
 
   // useEffect(() => {
   //   if (!authLoading && isAuthenticated) {
@@ -54,6 +35,38 @@ const Page = () => {
   //     }
   //   }
   // }, [isAuthenticated, router, isAdmin, authLoading]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setFormLoading(true);
+
+    if (password !== confirmPassword) {
+      setError("As senhas não coincidem.");
+      toast.error("As senhas não coincidem.");
+      setFormLoading(false);
+      return;
+    }
+
+    if (password.length < 8) {
+      setError("A senha deve ter pelo menos 6 caracteres.");
+      toast.error("A senha deve ter pelo menos 6 caracteres.");
+      setFormLoading(false);
+      return;
+    }
+
+    try {
+      await register({ name, email, password });
+      toast.success("Usuário cadastrado com sucesso!");
+      router.push("/");
+    } catch (err: string | any) {
+      setError(err.response?.data?.message || "Erro ao cadastrar usuário.");
+      toast.error(error);
+      console.error("Erro ao cadastrar usuário:", err);
+    } finally {
+      setFormLoading(false);
+    }
+  };
 
   if (authLoading) {
     return (
@@ -68,31 +81,38 @@ const Page = () => {
   return (
     <section className="flex items-center justify-center">
       <Form
-        title="Login"
-        subtitle="Faça Entre em sua conta para continuar suas compras"
-        textButton="Entrar"
+        title="Cadastre-se"
+        subtitle="Crie uma conta"
+        textButton="Cadastrar"
         onSubmit={handleSubmit}
         isLoading={formLoading}
         otherWay={
           <Register
-            text="Não possui uma conta?"
-            texLink="Cadastre-se"
-            link="/register"
+            text="Já possui uma conta?"
+            texLink="Faça login"
+            link="/login"
           />
         }
       >
-        <div className="inputs flex flex-col gap-6 w-full">
+        <div className="inputs w-full flex flex-col gap-4">
+          <GroupForm spanText="Nome" type="text" value={name} setValue={setName} />
           <GroupForm
             spanText="Email"
-            value={email}
             type="email"
+            value={email}
             setValue={setEmail}
           />
           <GroupForm
             spanText="Senha"
-            value={password}
             type="password"
+            value={password}
             setValue={setPassword}
+          />
+          <GroupForm
+            spanText="Confirmar Senha"
+            type="password"
+            value={confirmPassword}
+            setValue={setConfirmPassword}
           />
         </div>
       </Form>

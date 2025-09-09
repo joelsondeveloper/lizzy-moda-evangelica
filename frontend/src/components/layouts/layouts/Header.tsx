@@ -6,7 +6,9 @@ import NavButton from "../ui/NavButton";
 import { HiOutlineUser, HiOutlineShoppingBag } from "react-icons/hi2";
 import { FaSearch } from "react-icons/fa";
 
-const Header = () => {
+import { sideProps } from "@/app/layout";
+
+const Header = ({ sideDrawer }: { sideDrawer: (side: sideProps) => void }) => {
   const navLinks = [
     {
       title: "Home",
@@ -27,7 +29,7 @@ const Header = () => {
   ];
 
   return (
-    <header className="px-[clamp(1rem,5vw,5rem)] py-4 gap-4 flex flex-col fixed w-full">
+    <header className="px-[clamp(1rem,5vw,5rem)] py-4 gap-4 flex flex-col fixed w-full backdrop-blur-sm z-2">
       <div className="header-top flex items-center justify-between gap-4">
         <div className="logo-section flex gap-4 flex-shrink-0">
           <div className="image-container relative w-12 h-12 border rounded-full">
@@ -55,10 +57,10 @@ const Header = () => {
           />
         </div>
         <div className="actions flex gap-5">
-          <NavButton>
+          <NavButton size="w-12" handleClick={() => sideDrawer("auth")}>
             <HiOutlineUser />
           </NavButton>
-          <NavButton>
+          <NavButton size="w-12" handleClick={() => sideDrawer("cart")}>
             <span
               className="cart-count absolute top-0 right-0 w-4 aspect-square text-xs text-white bg-primary-accent-light
             dark:bg-primary-accent-dark rounded-full flex items-center justify-center"

@@ -1,11 +1,11 @@
 import React from 'react'
 
-const app = () => {
+const CartDrawer = () => {
   return (
     <div>
-      
+      cart
     </div>
   )
 }
 
-export default app
+export default CartDrawer
