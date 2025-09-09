@@ -30,7 +30,7 @@ const Header = () => {
     <header className="px-[clamp(1rem,5vw,5rem)] py-4 gap-4 flex flex-col fixed w-full">
       <div className="header-top flex items-center justify-between gap-4">
         <div className="logo-section flex gap-4 flex-shrink-0">
-          <div className="image-container relative w-12 h-12">
+          <div className="image-container relative w-12 h-12 border rounded-full">
             <Image
               src="/logo.png"
               alt="Logo"
@@ -50,7 +50,7 @@ const Header = () => {
           </button>
           <input
             type="text"
-            className="w-full h-full px-4 py-2 rounded-full"
+            className="w-full h-full px-4 py-2 rounded-full focus:outline-none"
             placeholder="Buscar..."
           />
         </div>

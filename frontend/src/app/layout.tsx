@@ -29,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className="">
       <body
-        className={`${InterFont.variable} ${PlayfairFont.variable} font-inter antialiased text-primary-accent-light dark:text-primary-accent-dark  bg-card-background-light dark:bg-page-background-dark`}
+        className={`${InterFont.variable} ${PlayfairFont.variable} font-inter antialiased text-primary-accent-light dark:text-primary-accent-dark  bg-card-background-light dark:bg-card-background-dark`}
       >
         <AuthProvider>
           <Header />
