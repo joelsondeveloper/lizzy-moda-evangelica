@@ -1,122 +1,125 @@
-const User = require('../models/User');
-const jwt = require('jsonwebtoken');
+const User = require("../models/User");
+const jwt = require("jsonwebtoken");
 
 const generateToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, {
-        expiresIn: '30d',
-    });
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: "30d",
+  });
 };
 
 const registerUser = async (req, res) => {
-    const { name, email, password } = req.body;
+  const { name, email, password } = req.body;
 
-    if (!name || !email || !password) {
-        return res.status(400).json({ message: 'Por favor preencha todos os campos' });
+  if (!name || !email || !password) {
+    return res
+      .status(400)
+      .json({ message: "Por favor preencha todos os campos" });
+  }
+
+  try {
+    const normalizedEmail = email.toLowerCase();
+    const userExists = await User.findOne({ email: normalizedEmail });
+
+    if (userExists) {
+      return res.status(400).json({ message: "Usuario ja cadastrado" });
     }
 
-    try {
-        const normalizedEmail = email.toLowerCase();
-        const userExists = await User.findOne({ email: normalizedEmail });
+    const user = await User.create({
+      name,
+      email: normalizedEmail,
+      password,
+    });
 
-        if (userExists) {
-            return res.status(400).json({ message: 'Usuario ja cadastrado' });
-        }
+    if (user) {
+      const token = generateToken(user._id);
 
-        const user = await User.create({
-            name,
-            email: normalizedEmail,
-            password,
-        });
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+      });
 
-        if (user) {
-
-            const token = generateToken(user._id);
-
-            res.cookie('token', token, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
-                maxAge: 30 * 24 * 60 * 60 * 1000,
-            });
-
-            res.status(201).json({
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                isAdmin: user.isAdmin,
-            });
-        } else {
-            res.status(400).json({ message: 'Erro ao criar usuario' });
-        }
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Erro interno do servidor" });
+      res.status(201).json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        isAdmin: user.isAdmin,
+      });
+    } else {
+      res.status(400).json({ message: "Erro ao criar usuario" });
     }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erro interno do servidor" });
+  }
 };
 
 const authUser = async (req, res) => {
-    const { email, password } = req.body;
+  const { email, password } = req.body;
 
-    if (!email || !password) {
-        return res.status(400).json({ message: 'Por favor preencha todos os campos' });
+  if (!email || !password) {
+    return res
+      .status(400)
+      .json({ message: "Por favor preencha todos os campos" });
+  }
+
+  try {
+    const normalizedEmail = email.toLowerCase();
+    const user = await User.findOne({ email: normalizedEmail });
+
+    if (!user) {
+      return res.status(401).json({ message: "Email ou senha incorretos" });
     }
 
-    try {
-        const normalizedEmail = email.toLowerCase();
-        const user = await User.findOne({ email: normalizedEmail });
+    const isPasswordCorrect = await user.matchPassword(password);
 
-        if (!user) {
-            return res.status(401).json({ message: 'Email ou senha incorretos' });
-        }
-
-        const isPasswordCorrect = await user.matchPassword(password);
-
-        if (!isPasswordCorrect) {
-            return res.status(401).json({ message: 'Email ou senha incorretos' });
-        }
-
-        const token = generateToken(user._id);
-
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: 30 * 24 * 60 * 60 * 1000,
-        });
-
-        res.json({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            isAdmin: user.isAdmin
-        })
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Erro interno do servidor" });
+    if (!isPasswordCorrect) {
+      return res.status(401).json({ message: "Email ou senha incorretos" });
     }
+
+    const token = generateToken(user._id);
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
+
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      isAdmin: user.isAdmin,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erro interno do servidor" });
+  }
 };
 
 const getMe = async (req, res) => {
-    if (req.user) {
-        res.json({
-            _id: req.user._id,
-            name: req.user.name,
-            email: req.user.email,
-            isAdmin: req.user.isAdmin
-        });
-    } else {
-        res.status(404).json({ message: "Usuario nao encontrado" });
-    }
+  if (req.user) {
+    res.json({
+      _id: req.user._id,
+      name: req.user.name,
+      email: req.user.email,
+      isAdmin: req.user.isAdmin,
+    });
+  } else {
+    res.status(404).json({ message: "Usuario nao encontrado" });
+  }
 };
 
 const logoutUser = async (req, res) => {
-    res.cookie('token', '', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        expires: new Date(0),
-    });
-    res.status(200).json({ message: 'Deslogado com sucesso' });
+  res.cookie("token", "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    expires: new Date(0),
+  });
+  res.status(200).json({ message: "Deslogado com sucesso" });
 };
 
 module.exports = { registerUser, authUser, getMe, logoutUser };
