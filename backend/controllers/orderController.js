@@ -41,6 +41,7 @@ const createOrder = async (req, res) => {
       items: cart.items.map((item) => ({
         product: item.product._id,
         quantity: item.quantity,
+        price: item.product.price,
       })),
       totalPrice,
     });

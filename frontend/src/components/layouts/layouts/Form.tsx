@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import GeneralButton from "../ui/generalButton";
 
 interface FormProps {
   children: React.ReactNode;
@@ -19,7 +20,7 @@ const Form = ({ children, title, subtitle, textButton, onSubmit, isLoading, othe
         <p>{subtitle}</p>
       </header>
       {children}
-      <button className="w-full p-3 rounded-xl hover:scale-105 bg-primary-accent-light dark:bg-primary-accent-dark text-button-text-light dark:text-button-text-dark hover:bg-primary-accent-dark dark:hover:bg-primary-accent-light transition duration-300" disabled={isLoading}>{textButton}</button>
+      <GeneralButton color="bg-primary-accent-light dark:bg-primary-accent-dark text-button-text-light dark:text-button-text-dark hover:bg-primary-accent-dark dark:hover:bg-primary-accent-light" border=" rounded-xl" isLoading={isLoading}>{textButton}</GeneralButton>
       <div className="options relative flex items-center w-full">
         <p className="mx-auto px-1 text-center bg-page-background-light dark:bg-page-background-dark z-1">ou</p>
         <div className="line h-1 w-full absolute border-b border-primary-accent-light dark:border-primary-accent-dark"></div>

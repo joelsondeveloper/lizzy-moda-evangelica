@@ -8,6 +8,7 @@ const authRoutes = require('./routes/authRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/dashboard', dashboardRoutes); 
 
 // Conexão MongoDB
 mongoose.connect(process.env.MONGO_URL)

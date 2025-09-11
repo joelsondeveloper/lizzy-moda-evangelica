@@ -5,7 +5,8 @@ import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "../context/AuthContext";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 import Header from "@/components/layouts/layouts/Header";
 import ToastProvider from "@/providers/ToastProvider";
@@ -39,7 +40,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
 
+
+  const pathName = usePathname();
   const [wichSideDrawer, setWichSideDrawer] = useState<sideProps>("none");
+
+  const pathAdmin = pathName.startsWith("/admin");
+
+  useEffect(() => {
+    setWichSideDrawer("none");
+  }, [pathName]);
 
   return (
     <html lang="pt-BR" className="">
@@ -48,8 +57,8 @@ export default function RootLayout({
       >
         <AuthProvider>
           <ToastProvider>
-            <Header sideDrawer={setWichSideDrawer}/>
-            <main className="pt-32 relative">
+            {!pathAdmin && <Header sideDrawer={setWichSideDrawer}/>}
+            <main className={`relative ${!pathAdmin ? "pt-32" : ""}`}>
               {children}
               <SideDrawer isOpen={wichSideDrawer !== "none"} setIsOpen={setWichSideDrawer}>
                 {wichSideDrawer === "auth" && <AuthDrawer />}

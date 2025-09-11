@@ -53,3 +53,7 @@
   --font-inter: "Inter", sans-serif;
   --font-playfair: "Playfair Display", serif;
 }
+
+button, select {
+  cursor: pointer;
+}
