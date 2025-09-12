@@ -273,16 +273,16 @@ const Page: React.FC = () => {
           <table className="w-full table-custom">
             <thead>
               <tr className="flex justify-between">
-                <th>Nome</th>
-                <th>Preco</th>
-                <th>Quantidade</th>
+                <th>imagem</th>
+                <th>total vendido</th>
+                <th>total</th>
               </tr>
             </thead>
             <tbody className="flex flex-col">
               {popularProductsDisplay.products.map((product) => (
                 <tr className="flex justify-between" key={product._id}>
                   <td><Image src={product.imageUrl} alt={product.name} width={50} height={50} /></td>
-                  <td>{product.name}</td>
+                  <td>{product.quantitySold}</td>
                   <td>{product.totalRevenue}</td>
                 </tr>
               ))}

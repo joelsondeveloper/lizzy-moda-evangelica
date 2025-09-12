@@ -140,7 +140,7 @@ const getDashboardMetrics = async (req, res) => {
         {
             $project: {
                 _id: '$productDetails._id',
-                product: "$productDetails.name",
+                name: "$productDetails.name",
                 imageUrl: "$productDetails.imageUrl",
                 totalQuantitySold: 1,
                 totalRevenue: 1
