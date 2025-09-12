@@ -57,3 +57,34 @@
 button, select {
   cursor: pointer;
 }
+
+.table-custom {
+  width: 100%;
+  border-collapse: collapse; /* remove espaçamento de bordas */
+  text-align: center; /* centraliza o conteúdo */
+  font-family: 'Inter', sans-serif; /* fonte clean */
+}
+
+.table-custom th,
+.table-custom td {
+  padding: 12px 16px;
+}
+
+.table-custom thead th {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.table-custom tbody tr:nth-child(even) {
+  background-color: #f3f4f6; /* zebra striping leve */
+}
+
+.table-custom tbody tr:hover {
+  background-color: #e5e7eb; /* hover discreto */
+  transition: background-color 0.2s ease-in-out;
+}
+
+.table-custom td {
+  font-size: 0.9rem;
+  font-weight: 500;
+}

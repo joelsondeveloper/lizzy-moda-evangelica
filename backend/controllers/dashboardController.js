@@ -15,7 +15,7 @@ const getDashboardMetrics = async (req, res) => {
     } else {
       currentStartDate = new Date();
       currentEndDate = new Date();
-      currentEndDate.setFullYear(currentEndDate.getFullYear() + 1);
+      currentEndDate.setFullYear(currentEndDate.getFullYear() - 1);
     }
 
     const periodDurationMs = currentEndDate.getTime() - currentStartDate.getTime();
@@ -24,6 +24,13 @@ const getDashboardMetrics = async (req, res) => {
     const previousStartDate = new Date(
         previousEndDate.getTime() - periodDurationMs
     );
+
+    // DEBUG
+    console.log('Dashboard metrics:');
+    console.log('currentStartDate:', currentStartDate);
+    console.log('currentEndDate:', currentEndDate);
+    console.log('previousStartDate:', previousStartDate);
+    console.log('previousEndDate:', previousEndDate);
     
     const calculatePeriodMetrics = async (start, end) => {
         const totalProducts = await Product.countDocuments({ createdAt: { $lte: end } });
@@ -98,8 +105,8 @@ const getDashboardMetrics = async (req, res) => {
         {
             $match: {
                 createdAt: {
-                    $gte: previousStartDate,
-                    $lte: previousEndDate
+                    $gte: currentStartDate,
+                    $lte: currentEndDate
                 }
             }
         },

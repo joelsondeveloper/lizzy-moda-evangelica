@@ -10,6 +10,7 @@ import { usePathname } from "next/navigation";
 
 import Header from "@/components/layouts/layouts/Header";
 import ToastProvider from "@/providers/ToastProvider";
+import QueryProvider from "@/providers/QueryProvider";
 
 import "react-toastify/dist/ReactToastify.css";
 import SideDrawer from "@/components/layouts/layouts/SideDrawer";
@@ -57,7 +58,8 @@ export default function RootLayout({
       >
         <AuthProvider>
           <ToastProvider>
-            {!pathAdmin && <Header sideDrawer={setWichSideDrawer}/>}
+            <QueryProvider>
+              {!pathAdmin && <Header sideDrawer={setWichSideDrawer}/>}
             <main className={`relative ${!pathAdmin ? "pt-32" : ""}`}>
               {children}
               <SideDrawer isOpen={wichSideDrawer !== "none"} setIsOpen={setWichSideDrawer}>
@@ -65,6 +67,7 @@ export default function RootLayout({
                 {wichSideDrawer === "cart" && <CartDrawer />}
               </SideDrawer>
             </main>
+            </QueryProvider>
           </ToastProvider>
         </AuthProvider>
       </body>
