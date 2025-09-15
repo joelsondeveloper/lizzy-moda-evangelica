@@ -1,11 +1,9 @@
 "use client";
 
-import { FaRotateLeft } from "react-icons/fa6";
-// import { navLinks } from "./layout";
+import { FaRotateRight } from "react-icons/fa6";
 import StatCard from "@/components/admin/StatCard";
 
 import {
-  HiOutlineViewColumns,
   HiOutlineTag,
   HiOutlineArchiveBox,
 } from "react-icons/hi2";
@@ -16,14 +14,11 @@ import {
   getDashboardData,
   DashboardData,
   DashboardMetrics,
-  MetricValueAndChange,
 } from "@/services/dashboard";
 import React, { useEffect } from "react";
 import DashboardCard from "@/components/admin/DashboardCard";
-import Link from "next/link";
 import Image from "next/image";
 
-type IconType = React.ComponentType<{ className: string }>;
 
 interface RecentOrdersSectionData {
   title: string;
@@ -193,8 +188,8 @@ const Page: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] text-[var(--color-text-primary-light)] dark:text-[var(--color-text-primary-dark)]">
-        <FaRotateLeft className="animate-spin h-8 w-8 text-[var(--color-primary-accent-light)] dark:text-[var(--color-primary-accent-dark)] mb-4" />
+      <div className="flex flex-col items-center justify-center min-h-[400px] text-[var(--color-text-primary-light)] dark:text-[var(--color-text-primary-dark)] z-5">
+        <FaRotateRight className="animate-spin h-8 w-8 text-[var(--color-primary-accent-light)] dark:text-[var(--color-primary-accent-dark)] mb-4" />
         <p className="text-lg">Carregando dados do dashboard...</p>
       </div>
     );
@@ -225,7 +220,7 @@ const Page: React.FC = () => {
           <select
             name="limit"
             className="p-2 rounded-lg transition duration-300 bg-page-background-light dark:bg-page-background-dark 
-          hover:bg-primary-accent-light dark:hover:bg-primary-accent-dark hover:text-button-text-light dark:hover:text-button-text-dark text-text-primary-light dark:text-text-primary-dark"
+          hover:bg-primary-accent-light dark:hover:bg-primary-accent-dark hover:text-button-text-light dark:hover:text-button-text-dark text-text-primary-light dark:text-text-primary-dark" onChange={(e) => setSelectedPeriod(e.target.value)}
           >
             <option value="30">Ultimos 30 dias</option>
             <option value="365">Ultimos 365 dias</option>
@@ -236,7 +231,7 @@ const Page: React.FC = () => {
           hover:bg-primary-accent-dark dark:hover:bg-primary-accent-light hover:scale-105 text-button-text-light dark:text-button-text-dark"
             onClick={handleReset}
           >
-            <FaRotateLeft size="50%" />
+            <FaRotateRight size="50%" />
           </button>
         </div>
       </header>
@@ -245,7 +240,7 @@ const Page: React.FC = () => {
           <StatCard key={link.title} data={link} />
         ))}
       </div>
-      <div className="content">
+      <div className="content flex flex-wrap justify-center gap-6">
         <DashboardCard title="Pedidos Recentes" router="/admin/orders">
           <table className="w-full table-custom">
             <thead>
@@ -281,9 +276,16 @@ const Page: React.FC = () => {
             <tbody className="flex flex-col">
               {popularProductsDisplay.products.map((product) => (
                 <tr className="flex justify-between" key={product._id}>
-                  <td><Image src={product.imageUrl} alt={product.name} width={50} height={50} /></td>
-                  <td>{product.quantitySold}</td>
-                  <td>{product.totalRevenue}</td>
+                  <td>
+                    <div className="img-container relative w-15 aspect-square rounded-2xl">
+                      <Image src={product.imageUrl} alt={product.name} fill className="h-12 w-12 aspect-square rounded-2xl object-cover"/>
+                    </div>
+                  </td>
+                  <td className="flex flex-col gap-1">
+                    <h4 className="text-sm font-medium text-text-primary-light dark:text-text-primary-dark">{product.name}</h4>
+                    <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">{product.quantitySold} vendas</p>
+                  </td>
+                  <td>R${product.totalRevenue}</td>
                 </tr>
               ))}
             </tbody>

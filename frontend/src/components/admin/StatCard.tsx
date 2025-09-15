@@ -5,7 +5,8 @@ interface StatCardProps {
   data: {
     title: string;
     value: number;
-    icon: Element;
+    icon: JSX.Element;
+    change: number;
   };
 }
 

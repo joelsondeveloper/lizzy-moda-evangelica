@@ -37,7 +37,6 @@ const Page = () => {
   // }, [isAuthenticated, router, isAdmin, authLoading]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
     setError(null);
     setFormLoading(true);
 
@@ -49,8 +48,8 @@ const Page = () => {
     }
 
     if (password.length < 8) {
-      setError("A senha deve ter pelo menos 6 caracteres.");
-      toast.error("A senha deve ter pelo menos 6 caracteres.");
+      setError("A senha deve ter pelo menos 8 caracteres.");
+      toast.error("A senha deve ter pelo menos 8 caracteres.");
       setFormLoading(false);
       return;
     }

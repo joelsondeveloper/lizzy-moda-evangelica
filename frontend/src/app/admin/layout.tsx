@@ -2,6 +2,7 @@
 
 import React, { useEffect, ReactNode, useState } from "react";
 import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import AdminSideBar from "@/components/admin/AdminSideBar";
 import { toast } from "react-toastify";
@@ -22,6 +23,8 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
   const { user, isAuthenticated, isLoading, isAdmin } = useAuth();
 
   const [isOpen, setIsOpen] = useState(false);
+
+  const pathname = usePathname();
 
   const navLinks = [
     {
@@ -50,6 +53,10 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
       icon: <FaUsers />,
     },
   ];
+
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     if (!isLoading) {

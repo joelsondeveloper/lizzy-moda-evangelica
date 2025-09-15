@@ -40,8 +40,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
-
   const pathName = usePathname();
   const [wichSideDrawer, setWichSideDrawer] = useState<sideProps>("none");
 
@@ -59,14 +57,17 @@ export default function RootLayout({
         <AuthProvider>
           <ToastProvider>
             <QueryProvider>
-              {!pathAdmin && <Header sideDrawer={setWichSideDrawer}/>}
-            <main className={`relative ${!pathAdmin ? "pt-32" : ""}`}>
-              {children}
-              <SideDrawer isOpen={wichSideDrawer !== "none"} setIsOpen={setWichSideDrawer}>
-                {wichSideDrawer === "auth" && <AuthDrawer />}
-                {wichSideDrawer === "cart" && <CartDrawer />}
-              </SideDrawer>
-            </main>
+              {!pathAdmin && <Header sideDrawer={setWichSideDrawer} />}
+              <main className={`relative ${!pathAdmin ? "pt-32" : ""}`}>
+                {children}
+                <SideDrawer
+                  isOpen={wichSideDrawer !== "none"}
+                  setIsOpen={setWichSideDrawer}
+                >
+                  {wichSideDrawer === "auth" && <AuthDrawer />}
+                  {wichSideDrawer === "cart" && <CartDrawer />}
+                </SideDrawer>
+              </main>
             </QueryProvider>
           </ToastProvider>
         </AuthProvider>

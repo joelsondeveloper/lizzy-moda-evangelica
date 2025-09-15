@@ -7,6 +7,7 @@ import { HiOutlineUser, HiOutlineShoppingBag } from "react-icons/hi2";
 import { FaSearch } from "react-icons/fa";
 
 import { sideProps } from "@/app/layout";
+import Search from "../ui/Search";
 
 const Header = ({ sideDrawer }: { sideDrawer: (side: sideProps) => void }) => {
   const navLinks = [
@@ -46,16 +47,7 @@ const Header = ({ sideDrawer }: { sideDrawer: (side: sideProps) => void }) => {
           </div>
         </div>
 
-        <div className="search-bar relative h-12 w-[600px] flex items-center justify-center rounded-xl bg-link-light dark:bg-link-dark border">
-          <button type="submit" className="absolute right-2">
-            <FaSearch />
-          </button>
-          <input
-            type="text"
-            className="w-full h-full px-4 py-2 rounded-full focus:outline-none"
-            placeholder="Buscar..."
-          />
-        </div>
+        <Search />
         <div className="actions flex gap-5">
           <NavButton size="w-12" handleClick={() => sideDrawer("auth")}>
             <HiOutlineUser />
