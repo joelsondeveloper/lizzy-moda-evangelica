@@ -45,6 +45,8 @@ const Page: React.FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
+  const [searchTerm, setSearchTerm] = useState("");
+
   const {
     register,
     handleSubmit,
@@ -70,6 +72,10 @@ const Page: React.FC = () => {
     queryKey: ["adminCategories"],
     queryFn: getCategories,
   });
+
+  const filteredCategories = data?.filter((category) =>
+    category.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleError = (error: ApiError, fallback: string) => {
     const message = error.response?.data?.message || fallback;
@@ -190,7 +196,7 @@ const Page: React.FC = () => {
           </div>
           <div className="actions flex items-center justify-between gap-4">
             <div className="search-container">
-              <Search />
+              <Search value={searchTerm} setValue={setSearchTerm} />
             </div>
             <div className="btn-container">
               <GeneralButton
@@ -209,16 +215,14 @@ const Page: React.FC = () => {
             <table className="table-custom">
               <thead>
                 <tr>
-                  <th>ID</th>
                   <th>Nome</th>
                   <th>Data</th>
                   <th>Ações</th>
                 </tr>
               </thead>
               <tbody>
-                {data?.map((category) => (
+                {filteredCategories?.map((category) => (
                   <tr key={category._id}>
-                    <td>#{category._id.substring(0, 8)}</td>
                     <td>{category.name}</td>
                     <td>{category.createdAt.substring(0, 10)}</td>
                     <td>

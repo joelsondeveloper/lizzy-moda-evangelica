@@ -27,6 +27,8 @@ const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
+  const [isDragging, setIsDragging] = useState(false);
+
   useEffect(() => {
     setPreviewUrl(currentImageUrl || null);
   }, [currentImageUrl]);
@@ -55,7 +57,15 @@ const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
   const displayImage = previewUrl;
 
   return (
-    <div className="flex flex-col gap-2 items-center">
+    <div className="flex flex-col gap-2 items-center" onDragOver={(e) => {
+      e.preventDefault();
+      setIsDragging(true);
+    }} onDragLeave={() => setIsDragging(false)} onDrop={((e) => {
+      e.preventDefault();
+      setIsDragging(false);
+      const file = e.dataTransfer.files[0];
+      if (file) handleFileChange({ target: { files: [file] } } as any);
+    })}>
       <label htmlFor={id}>{label}</label>
       <div className="relative w-24 aspect-square">
         {displayImage ? (
@@ -77,7 +87,7 @@ const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
             </button>
           </div>
         ) : (
-            <label className="flex flex-col items-center justify-center w-full h-full rounded-2xl border-2 border-primary-accent-light dark:border-primary-accent-dark cursor-pointer">
+            <label className={`flex flex-col items-center justify-center w-full h-full rounded-2xl ${isDragging ? " outline-4 outline-dashed" : "border-2"} border-primary-accent-light dark:border-primary-accent-dark cursor-pointer`}>
               <HiOutlineUpload className="h-4 w-4 text-text-secondary-light dark:text-text-secondary-dark mb-2" />
               <span className="text-xs text-center text-text-secondary-light dark:text-text-secondary-dark">
                 Arraste e solte ou <br />

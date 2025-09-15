@@ -22,7 +22,7 @@ export interface ProductFormData {
     name: string;
     description: string;
     price: number;
-    size: string[];
+    size: string | string[];
     category: string;
     imageFile: File | null;
     currentImageUrl: string;
