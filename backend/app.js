@@ -3,6 +3,10 @@ const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const session = require('express-session');
+const passport = require('passport');
+
+
 const productRoutes = require('./routes/productRoutes');
 const authRoutes = require('./routes/authRoutes');
 const cartRoutes = require('./routes/cartRoutes');
@@ -11,6 +15,8 @@ const categoryRoutes = require('./routes/categoryRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 
 dotenv.config();
+
+require('./config/passport');
 
 const app = express();
 
@@ -26,6 +32,18 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
+
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: process.env.NODE_ENV === 'production'
+    }
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);

@@ -41,7 +41,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         try {
             const response = await getProfile();
             setUser(response);
-            console.log(response);
             setIsAuthenticated(response.isVerified);
             setIsUserVerified(response.isVerified);
             setIsAdmin(response.isAdmin);
