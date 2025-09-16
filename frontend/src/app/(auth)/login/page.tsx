@@ -107,15 +107,10 @@ const Page = () => {
           <>
             <div className="mt-6 text-center text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
               <div className="relative flex items-center py-5">
-                <div className="flex-grow border-t border-[var(--color-border-light)] dark:border-[var(--color-border-dark)]"></div>
-                <span className="flex-shrink mx-4 text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                  ou
-                </span>
-                <div className="flex-grow border-t border-[var(--color-border-light)] dark:border-[var(--color-border-dark)]"></div>
               </div>
               <Link
                 href={`${process.env.NEXT_PUBLIC_API_URL}/auth/google`}
-                className="w-full py-2 px-4 border border-[var(--color-border-light)] dark:border-[var(--color-border-dark)] rounded-md flex items-center justify-center space-x-2 bg-white dark:bg-gray-700 text-[var(--color-text-primary-light)] dark:text-[var(--color-text-primary-dark)] hover:bg-[var(--color-border-light)] dark:hover:bg-[var(--color-border-dark)] transition-colors"
+                className="w-full py-4 px-4 border border-[var(--color-border-light)] dark:border-[var(--color-border-dark)] rounded-md flex items-center justify-center space-x-2 bg-white dark:bg-gray-700 text-[var(--color-text-primary-light)] dark:text-[var(--color-text-primary-dark)] hover:bg-[var(--color-border-light)] dark:hover:bg-[var(--color-border-dark)] transition-colors"
               >
                 <FcGoogle size={24} />
                 <span>Continuar com o Google</span>

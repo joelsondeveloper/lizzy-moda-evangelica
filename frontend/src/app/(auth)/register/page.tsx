@@ -11,6 +11,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import HookFormInput from "@/components/layouts/ui/HookFormInput";
+import Link from "next/link";
+import { FcGoogle } from "react-icons/fc";
 
 const RegisterSchema = z
   .object({
@@ -72,18 +74,25 @@ const Page = () => {
     setFormError("root", { message: "" });
 
     try {
-      await authRegister({ name: data.name, email: data.email, password: data.password });
-      toast.success("Usuário cadastrado com sucesso! Verifique seu email para ativar sua conta.");
+      await authRegister({
+        name: data.name,
+        email: data.email,
+        password: data.password,
+      });
+      toast.success(
+        "Usuário cadastrado com sucesso! Verifique seu email para ativar sua conta."
+      );
       router.push(`/verify?email=${encodeURIComponent(data.email)}`);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || "Erro ao cadastrar usuário.";
+      const errorMessage =
+        err.response?.data?.message || "Erro ao cadastrar usuário.";
       setFormError("root", { message: errorMessage });
       toast.error(errorMessage);
-      
+
       if (errorMessage.includes("já cadastrado")) {
         setFormError("email", { type: "manual", message: errorMessage });
       }
-      
+
       console.error("Erro ao cadastrar usuário:", err);
     }
   };
@@ -107,18 +116,58 @@ const Page = () => {
         onSubmit={handleSubmit(onSubmit)}
         isLoading={isSubmitting}
         otherWay={
-          <Register
-            text="Já possui uma conta?"
-            texLink="Faça login"
-            link="/login"
-          />
+          <>
+            <div className="mt-6 text-center text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+              <div className="relative flex items-center py-5"></div>
+              <Link
+                href={`${process.env.NEXT_PUBLIC_API_URL}/auth/google`}
+                className="w-full py-4 px-4 border border-[var(--color-border-light)] dark:border-[var(--color-border-dark)] rounded-md flex items-center justify-center space-x-2 bg-white dark:bg-gray-700 text-[var(--color-text-primary-light)] dark:text-[var(--color-text-primary-dark)] hover:bg-[var(--color-border-light)] dark:hover:bg-[var(--color-border-dark)] transition-colors"
+              >
+                <FcGoogle size={24} />
+                <span>Continuar com o Google</span>
+              </Link>
+            </div>
+            <Register
+              text="Já possui uma conta?"
+              texLink="Faça login"
+              link="/login"
+            />
+          </>
         }
       >
         <div className="inputs w-full flex flex-col gap-4">
-          <HookFormInput spanText="Nome" error={errors.name} {...register("name")} placeholder="Seu nome" autoComplete="name" type="text" />
-          <HookFormInput spanText="Email" error={errors.email} {...register("email")} placeholder="seu@email.com" autoComplete="email" type="email" />
-          <HookFormInput spanText="Senha" error={errors.password} {...register("password")} placeholder="Minimo 6 caracteres" autoComplete="new-password" type="password" />
-          <HookFormInput spanText="Confirmar senha" error={errors.confirmPassword} {...register("confirmPassword")} placeholder="Confirmar senha" autoComplete="new-password" type="password" />
+          <HookFormInput
+            spanText="Nome"
+            error={errors.name}
+            {...register("name")}
+            placeholder="Seu nome"
+            autoComplete="name"
+            type="text"
+          />
+          <HookFormInput
+            spanText="Email"
+            error={errors.email}
+            {...register("email")}
+            placeholder="seu@email.com"
+            autoComplete="email"
+            type="email"
+          />
+          <HookFormInput
+            spanText="Senha"
+            error={errors.password}
+            {...register("password")}
+            placeholder="Minimo 6 caracteres"
+            autoComplete="new-password"
+            type="password"
+          />
+          <HookFormInput
+            spanText="Confirmar senha"
+            error={errors.confirmPassword}
+            {...register("confirmPassword")}
+            placeholder="Confirmar senha"
+            autoComplete="new-password"
+            type="password"
+          />
         </div>
       </Form>
     </section>
