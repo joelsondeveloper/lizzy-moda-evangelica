@@ -200,6 +200,7 @@ const getMe = async (req, res) => {
       name: req.user.name,
       email: req.user.email,
       isAdmin: req.user.isAdmin,
+      isVerified: req.user.isVerified,
     });
   } else {
     res.status(404).json({ message: "Usuario nao encontrado" });

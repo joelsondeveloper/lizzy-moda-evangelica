@@ -24,6 +24,8 @@ type Props = {
 const AuthDrawer = ({ setIsConfirming }: Props) => {
   const { user, isAuthenticated, isLoading, isAdmin } = useAuth();
 
+  console.log(isAuthenticated);
+
   const navLinksUser = [
     {
       title: "Meus Pedidos",

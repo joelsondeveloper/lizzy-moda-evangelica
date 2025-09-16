@@ -3,14 +3,13 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { loginUser, registerUser, logoutUser, getProfile } from "../services/auth";
 import type { LoginCredentials, RegisterData } from "../services/auth";
-import api from "../lib/api";
-import { get } from "http";
 
 interface User {
     _id: string;
     name: string;
     email: string;
     isAdmin: boolean;
+    isVerified: boolean;
 }
 
 interface AuthContextType {
@@ -21,6 +20,8 @@ interface AuthContextType {
     logout: () => void;
     isAuthenticated: boolean;
     isAdmin: boolean;
+    isUserVerified: boolean;
+    refetchUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -34,39 +35,43 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
+    const [isUserVerified, setIsUserVerified] = useState<boolean>(false);
+
+    const refetchUser = async () => {
+        try {
+            const response = await getProfile();
+            setUser(response);
+            console.log(response);
+            setIsAuthenticated(response.isVerified);
+            setIsUserVerified(response.isVerified);
+            setIsAdmin(response.isAdmin);
+        } catch (error) {
+            console.error('Erro ao verificar status de autenticacao:', error);
+            setUser(null);
+            setIsAuthenticated(false);
+            setIsUserVerified(false);
+            setIsAdmin(false);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const checkAuthStatus = async () => {
-            try {
-                const response = await getProfile();
-                setUser(response);
-                setIsAuthenticated(true);
-                setIsAdmin(response.isAdmin);
-                setIsLoading(false);
-            } catch (error) {
-                console.error('Erro ao verificar status de autenticacao:', error);
-                setUser(null);
-                setIsAuthenticated(false);
-                setIsAdmin(false);
-            } finally {
-                setIsLoading(false);
-            }
-        
-        };
 
-        checkAuthStatus()
+        refetchUser();
+        
 }, []);
 
 const login = async (credentials: LoginCredentials) => {
     setIsLoading(true);
     try {
-        const response = await loginUser(credentials);
-        setUser(response);
-        setIsAuthenticated(true);
-        setIsAdmin(response.isAdmin);
+        await loginUser(credentials);
+        await refetchUser();
+        return Promise.resolve();
     } catch (error) {
         setUser(null);
         setIsAuthenticated(false);
+        setIsUserVerified(false);
         setIsAdmin(false);
         throw error;
     } finally {
@@ -77,10 +82,12 @@ const login = async (credentials: LoginCredentials) => {
 const register = async (data: RegisterData) => {
     setIsLoading(true);
     try {
-        const response = await registerUser(data);
-        setUser(response);
-        setIsAuthenticated(true);
-        setIsAdmin(response.isAdmin);
+        await registerUser(data);
+        setUser(null);
+        setIsAuthenticated(false);
+        setIsUserVerified(false);
+        setIsAdmin(false);
+        return Promise.resolve();
     } catch (error) {
         setUser(null);
         setIsAuthenticated(false);
@@ -115,6 +122,8 @@ const contextValue: AuthContextType = {
     logout,
     isAuthenticated,
     isAdmin,
+    isUserVerified,
+    refetchUser
 };
 
 return (

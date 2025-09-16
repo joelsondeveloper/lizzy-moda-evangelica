@@ -20,8 +20,8 @@ const verificationSchema = z.object({
   email: z.string().email("Email inválido"),
   code: z
     .string()
-    .min(6, "O código deve ter 6 caracteres")
-    .max(6, "O código deve ter 6 caracteres"),
+    .min(7, "O código deve ter 7 caracteres")
+    .max(7, "O código deve ter 7 caracteres"),
 });
 
 type VerificationFormSchema = z.infer<typeof verificationSchema>;
@@ -38,7 +38,7 @@ const Page: React.FC = () => {
   const searchParams = useSearchParams();
   const initialEmail = searchParams.get("email") || "";
 
-  const { isAuthenticated, isAdmin, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isAdmin, isLoading: authLoading, refetchUser } = useAuth();
 
   const {
     register,
@@ -73,6 +73,7 @@ const Page: React.FC = () => {
     try {
       const response = await verifyUser(data);
       toast.success(response.message || "Usuário verificado com sucesso!");
+      refetchUser();
       router.push("/login");
     } catch (err: any) {
       const errorMessage =
@@ -103,7 +104,7 @@ return (
       onSubmit={handleSubmit(onSubmit)}
       isLoading={isSubmitting}
     >
-      <div className="inputs w-full flex flex-col gap-6">
+      <div className="inputs w-full flex flex-col gap-7">
         <HookFormInput
           spanText="E-mail"
           id="email"
@@ -125,7 +126,7 @@ return (
           type="text"
           placeholder="123456"
           {...register("code")}
-          maxLength={6}
+          maxLength={7}
           autoComplete="off"
         />
         {errors.root && (

@@ -33,7 +33,7 @@ type ApiError = {
 const Page = () => {
   const [error, setError] = useState<string | null>(null);
 
-  const { login, isAuthenticated, isAdmin, isLoading: authLoading } = useAuth();
+  const { login, isUserVerified, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
   const {

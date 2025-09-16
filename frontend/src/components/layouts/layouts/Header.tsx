@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import NavButton from "../ui/NavButton";
 import { HiOutlineUser, HiOutlineShoppingBag } from "react-icons/hi2";
-import { FaSearch } from "react-icons/fa";
 
 import { sideProps } from "@/app/layout";
 import Search from "../ui/Search";
@@ -47,7 +46,7 @@ const Header = ({ sideDrawer }: { sideDrawer: (side: sideProps) => void }) => {
           </div>
         </div>
 
-        <Search />
+        <Search value="" setValue={() => {}} />
         <div className="actions flex gap-5">
           <NavButton size="w-12" handleClick={() => sideDrawer("auth")}>
             <HiOutlineUser />

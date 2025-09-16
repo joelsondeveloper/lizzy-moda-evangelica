@@ -21,6 +21,7 @@ interface User {
     name: string;
     email: string;
     isAdmin: boolean;
+    isVerified: boolean;
 }
 
 export const verifyUser = async (data: VerifyData): Promise<{message: string; user?: User}> => {
