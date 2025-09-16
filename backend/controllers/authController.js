@@ -92,6 +92,9 @@ const registerUser = async (req, res) => {
 const verifyUser = async (req, res) => {
   const { email, code } = req.body;
 
+  // debug
+  console.log(email, code);
+
   if (!email || !code) {
     return res
       .status(400)

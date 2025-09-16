@@ -1,5 +1,10 @@
 import api from "../lib/api";
 
+export interface VerifyData {
+    email: string;
+    code: string;
+};
+
 export interface LoginCredentials {
     email: string;
     password: string;
@@ -16,6 +21,17 @@ interface User {
     name: string;
     email: string;
     isAdmin: boolean;
+}
+
+export const verifyUser = async (data: VerifyData): Promise<{message: string; user?: User}> => {
+
+    try {
+        const response = await api.post('/auth/verify', data);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+    
 }
 
 export const registerUser = async (data: RegisterData): Promise<User> => {

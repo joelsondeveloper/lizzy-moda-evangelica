@@ -3,7 +3,7 @@ import { FieldError } from "react-hook-form";
 
 type HookFormInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   spanText: string;
-  error?: FieldError; // pra exibir mensagens do RHF
+  error?: FieldError | undefined; // pra exibir mensagens do RHF
 };
 
 const HookFormInput = ({ spanText, error, ...props }: HookFormInputProps) => {
