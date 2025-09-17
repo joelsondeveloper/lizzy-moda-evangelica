@@ -3,20 +3,16 @@
 import GeneralButton from "@/components/layouts/ui/GeneralButton";
 import DashboardCard from "@/components/admin/DashboardCard";
 import Search from "@/components/layouts/ui/Search";
-import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
+import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import ConfirmationModal from "@/components/layouts/ui/ConfirmationModal";
-import {
-  createProduct,
-  updateProduct,
-  deleteProduct,
-  Product,
-  getProducts,
-  ProductFormData,
-} from "@/services/product";
-import { getCategories, Category } from "@/services/category";
+import {  Order,
+  getOrders,
+  deleteOrder,
+  updateOrderStatus,
+  UpdateOrderStatusData, } from "@/services/order";
 import SideForm from "@/components/layouts/layouts/SideForm";
 import Form from "@/components/layouts/layouts/Form";
 import { useForm } from "react-hook-form";
@@ -237,25 +233,15 @@ const Page: React.FC = () => {
         <header className="flex flex-col items-center gap-4">
           <div className="title flex flex-col justify-center text-center gap-2">
             <h2 className="font-playfair text-3xl font-bold">
-              Gerenciar Produtos
+              Gerenciar Pedidos
             </h2>
             <p className="text-text-secondary-light dark:text-text-secondary-dark">
-              Organize seus produtos
+              Visualize e gerencie todos os pedidos da loja
             </p>
           </div>
           <div className="actions flex items-center justify-between gap-4">
             <div className="search-container">
               <Search  value={searchTerm} setValue={setSearchTerm}/>
-            </div>
-            <div className="btn-container">
-              <GeneralButton
-                color="bg-primary-accent-light dark:bg-primary-accent-dark text-button-text-light dark:text-button-text-dark hover:bg-primary-accent-dark dark:hover:bg-primary-accent-light"
-                border=" rounded-xl"
-                onClick={handleOpenCreateModal}
-              >
-                <FaPlus />
-                <span className="hidden md:block">Nova Categoria</span>
-              </GeneralButton>
             </div>
           </div>
         </header>
@@ -265,12 +251,10 @@ const Page: React.FC = () => {
             <table className="table-custom w-full text-center">
               <thead>
                 <tr>
-                  <th>Imagem</th>
-                  <th>Nome</th>
-                  <th>Preço</th>
-                  <th>Tamanho</th>
-                  <th>Categoria</th>
-                  <th>Estoque</th>
+                  <th>Cliente</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Data</th>
                   <th>Ações</th>
                 </tr>
               </thead>

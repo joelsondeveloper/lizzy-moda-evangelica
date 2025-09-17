@@ -1,6 +1,16 @@
 const Order = require("../models/Order");
 const Cart = require("../models/Cart");
 const Product = require("../models/Product");
+const User = require("../models/User");
+
+const populateOrderDetails = (query) => {
+  return query
+  .populate('user', 'name email')
+  .populate({
+    path: 'items.product',
+    populate: { path: 'category', select: 'name' }
+  })
+}
 
 const createOrder = async (req, res) => {
   try {
@@ -12,17 +22,20 @@ const createOrder = async (req, res) => {
     }
 
     let totalPrice = 0;
-    cart.items.forEach((item) => {
-      if (item.product && item.product.price) {
-        totalPrice += item.product.price * item.quantity;
-      } else {
-        console.warn(
-          `Produto ID ${
-            item.product ? item.product._id : "desconhecido"
-          } no carrinho do usuário ${req.user._id} não tem preço válido.`
-        );
+    const orderItemsForCreation = [];
+    
+    for (const item of cart.items) {
+      if (!item.product || !item.product.price || isNaN(item.product.price) || item.product.price <= 0) {
+        return res.status(400).json({ message: `um produto no carrinho (${item.product ? item.product.name : 'ID' + item.product._id}) tem preço inválido` });
       }
-    });
+      totalPrice += item.product.price * item.quantity;
+      orderItemsForCreation.push({
+        product: item.product._id,
+        quantity: item.quantity,
+        price: item.product.price
+      })
+    }
+
 
     const message = cart.items
       .map((item) => {
@@ -38,11 +51,7 @@ const createOrder = async (req, res) => {
 
     const order = await Order.create({
       user: req.user._id,
-      items: cart.items.map((item) => ({
-        product: item.product._id,
-        quantity: item.quantity,
-        price: item.product.price,
-      })),
+      items: orderItemsForCreation,
       totalPrice,
     });
 
@@ -53,7 +62,9 @@ const createOrder = async (req, res) => {
       message
     )}%0ATotal:%20R$${totalPrice.toFixed(2)}`;
 
-    res.status(201).json({ order, whatsappLink });
+    const populateOrder = await populateOrderDetails(Order.findById(order._id));
+
+    res.status(201).json({ order: populateOrder, whatsappLink });
   } catch (error) {
     console.error("Erro ao criar pedido:", error);
     res.status(500).json({ message: "Erro ao criar pedido", error: error.message });
@@ -62,13 +73,7 @@ const createOrder = async (req, res) => {
 
 const getUserOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ user: req.user._id }).populate({
-            path: 'items.product',
-            populate: {
-                path: 'category',
-                select: 'name'
-            }
-        });
+    const orders = await populateOrderDetails(Order.find({ user: req.user._id }))
     res.json(orders);
   } catch (error) {
     console.error("Erro ao buscar pedidos:", error);
@@ -76,7 +81,104 @@ const getUserOrders = async (req, res) => {
   }
 };
 
+const getOrdersForAdmin = async (req, res) => {
+  try {
+    let ordersQuery
+    
+    if (req.user && req.user.isAdmin) {
+      ordersQuery = Order.find()
+    } else {
+      return res.status(401).json({ message: "Acesso restrito para administradores" });
+    }
+    
+    const orders = await populateOrderDetails(ordersQuery.sort({ createdAt: -1 }))
+    res.json(orders);
+    
+  } catch (error) {
+    console.error("Erro ao buscar pedidos:", error);
+    res.status(500).json({ message: "Erro ao buscar pedidos", error: error.message });
+  }
+};
+
+const getOrderById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const order = await populateOrderDetails(Order.findById(id));
+    
+    if (!order) {
+      return res.status(404).json({ message: "Pedido nao encontrado" });
+    }
+    
+    if (!req.user.isAdmin && order.user._id.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Acesso nao autorizado. Apenas administradores podem ver pedidos de outros usuários" });
+    }
+
+    res.json(order);
+  } catch (error) {
+    console.error("Erro ao buscar pedido por ID:", error);
+    res.status(500).json({ message: "Erro ao buscar pedido", error: error.message });
+  }
+};
+
+const updateOrderStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!["pendente", "confirmado", "cancelado"].includes(status)) {
+      return res.status(400).json({ message: "Status de pedido invalido" });
+    }
+
+    const order = await Order.findById(id);
+
+    if (!order) {
+      return res.status(404).json({ message: "Pedido nao encontrado" });
+    }
+
+    if (!req.user.isAdmin) {
+      return res.status(403).json({ message: "Acesso nao autorizado. Apenas administradores podem atualizar status de pedidos" });
+    }
+
+    order.status = status;
+    await order.save();
+
+    const populateOrder = await populateOrderDetails(Order.findById(id));
+
+    res.json(populateOrder);
+  } catch (error) {
+    console.error("Erro ao atualizar status do pedido:", error);
+    res.status(500).json({ message: "Erro ao atualizar status do pedido", error: error.message });
+  }
+};
+
+const deleteOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const order = await Order.findById(id);
+
+    if (!order) {
+      return res.status(404).json({ message: "Pedido nao encontrado" });
+    }
+
+    if (!req.user.isAdmin) {
+      return res.status(403).json({ message: "Acesso nao autorizado. Apenas administradores podem deletar pedidos" });
+    }
+
+    await Order.deleteOne();
+
+    res.json({ message: "Pedido deletado com sucesso" });
+  } catch (error) {
+    console.error("Erro ao deletar pedido:", error);
+    res.status(500).json({ message: "Erro ao deletar pedido", error: error.message });
+  }
+    }
+
 module.exports = {
   createOrder,
   getUserOrders,
+  getOrdersForAdmin,
+  getOrderById,
+  updateOrderStatus,
+  deleteOrder
 };
