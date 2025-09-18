@@ -2,9 +2,9 @@
 
 import DashboardCard from "@/components/admin/DashboardCard";
 import Search from "@/components/layouts/ui/Search";
-import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
+import { FaTrash } from "react-icons/fa";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import ConfirmationModal from "@/components/layouts/ui/ConfirmationModal";
