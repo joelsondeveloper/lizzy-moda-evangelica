@@ -5,7 +5,7 @@ const getUsersForAdmin = async (req, res) => {
         if (!req.user || !req.user.isAdmin) {
             return res.status(403).json({ message: "Acesso restrito para administradores" });
         }
-        const users = (await User.find({}).select("-password")).toSort({createdAt: -1});
+        const users = (await User.find({}).select("-password")).sort({createdAt: -1});
         res.json(users);
     } catch (error) {
         console.error("Erro ao buscar usuários:", error);
