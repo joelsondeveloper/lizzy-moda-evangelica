@@ -1,235 +1,103 @@
 "use client";
 
-import GeneralButton from "@/components/layouts/ui/GeneralButton";
 import DashboardCard from "@/components/admin/DashboardCard";
 import Search from "@/components/layouts/ui/Search";
 import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 import ConfirmationModal from "@/components/layouts/ui/ConfirmationModal";
-import {  Order,
-  getOrders,
+import {
+  Order,
+  getOrdersForAdmin,
   deleteOrder,
   updateOrderStatus,
-  UpdateOrderStatusData, } from "@/services/order";
-import SideForm from "@/components/layouts/layouts/SideForm";
-import Form from "@/components/layouts/layouts/Form";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import HookFormInput from "@/components/layouts/ui/HookFormInput";
-import ImageUploadField from "@/components/admin/ImageUploadField";
-import Image from "next/image";
-import { watch } from "fs";
+  updateOrderStatusData,
+} from "@/services/order";
 
-const productSchema = z.object({
-  name: z
-    .string()
-    .min(3, "O nome do produto deve ter pelo menos 3 caracteres.")
-    .max(100, "O nome do produto deve ter no máximo 100 caracteres."),
-  description: z
-    .string()
-    .min(10, "A descrição do produto deve ter pelo menos 10 caracteres.")
-    .max(500, "A descrição do produto deve ter no máximo 500 caracteres."),
-  price: z
-    .number({ invalid_type_error: "O preço do produto deve ser um número." })
-    .positive("O preço do produto deve ser maior que zero."),
-  size: z.array(z.string()).min(1, "Selecione pelo menos um tamanho."),
-  category: z.string().min(1, "Selecione uma categoria."),
-  inStock: z.boolean(),
-  imageFile: z.instanceof(File).optional().nullable(),
-  currentImageUrl: z.string().optional().nullable(),
-});
-
-type ProductFormSchema = z.infer<typeof productSchema>;
 type ApiError = { response?: { data?: { message?: string } } };
 
 const Page: React.FC = () => {
   const queryClient = useQueryClient();
 
-  const availableSizes = ["P", "M", "G", "GG", "GGG"];
+  const router = useRouter();
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+  const [orderToDelete, setOrderToDelete] = useState<Order | null>(null);
 
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-
-  const[searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const {
-    data: products,
+    data: orders,
     isLoading,
     isError,
     error,
-  } = useQuery<Product[], Error>({
-    queryKey: ["adminProducts"],
-    queryFn: getProducts,
+  } = useQuery<Order[], Error>({
+    queryKey: ["adminOrders"],
+    queryFn: getOrdersForAdmin,
   });
 
-  const { data: categories } = useQuery<Category[], Error>({
-    queryKey: ["adminCategories"],
-    queryFn: getCategories,
-  });
-
-  const filteredProducts = products?.filter((product) => {
+  const filteredProducts = orders?.filter((order) => {
     const term = searchTerm.toLowerCase();
     return (
-      product.name.toLowerCase().includes(term) ||
-      product.description.toLowerCase().includes(term) ||
-      product.category?.name.toLowerCase().includes(term) ||
-      product.size.some((size: string) => size.toLowerCase().includes(term))
+      order._id.toLowerCase().includes(term) ||
+      order.user?.name.toLowerCase().includes(term) ||
+      order.user?.email.toLowerCase().includes(term) ||
+      order.status.toLowerCase().includes(term)
     );
   });
-  
-
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setError,
-    getValues,
-    formState: { errors, isSubmitting },
-  } = useForm<ProductFormSchema>({
-    resolver: zodResolver(productSchema),
-    defaultValues: {
-      name: "",
-      description: "",
-      price: 0,
-      size: Array.isArray(editingProduct?.size)
-        ? editingProduct.size
-        : editingProduct?.size
-        ? [editingProduct.size]
-        : [],
-      category: "",
-      inStock: true,
-    },
-  });
-
-  useEffect(() => {
-    if (editingProduct) {
-      const sizes =
-        editingProduct.size?.map((s: any) => {
-          // Se for array, pega o primeiro elemento
-          const val = Array.isArray(s) ? s[0] : s;
-          // Remove colchetes, aspas e espaços
-          return val.replace(/[\[\]"]/g, "").trim();
-        }) || [];
-
-      reset({
-        name: editingProduct.name,
-        description: editingProduct.description,
-        price: editingProduct.price,
-        size: sizes,
-        category:
-          typeof editingProduct.category === "string"
-            ? editingProduct.category
-            : editingProduct.category._id,
-        inStock: editingProduct.inStock,
-      });
-    } else {
-      reset({
-        name: "",
-        description: "",
-        price: 0,
-        size: [],
-        category: "",
-        inStock: true,
-      });
-    }
-  }, [editingProduct, reset]);
 
   const handleError = (error: ApiError, fallback: string) => {
     const message = error.response?.data?.message || fallback;
     toast.error(message);
-    if (message.includes("já existe")) {
-      setError("name", { type: "manual", message });
-    }
   };
 
   const deleteMutation = useMutation({
-    mutationFn: deleteProduct,
+    mutationFn: deleteOrder,
     onSuccess: () => {
-      toast.success("Produto excluído com sucesso!");
+      toast.success("pedido excluído com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["adminProducts"] });
     },
     onError: (error: ApiError) =>
-      handleError(error, "Erro ao excluir produto."),
-  });
-
-  const createMutation = useMutation({
-    mutationFn: createProduct,
-    onSuccess: () => {
-      toast.success("Produto criado com sucesso!");
-      queryClient.invalidateQueries({ queryKey: ["adminProducts"] });
-      setIsEditModalOpen(false);
-    },
-    onError: (error: ApiError) => handleError(error, "Erro ao criar produto."),
+      handleError(error, "Erro ao excluir pedido."),
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: ProductFormData }) =>
-      updateProduct(id, data),
-    onSuccess: () => {
-      toast.success("Produto atualizado com sucesso!");
-      queryClient.invalidateQueries({ queryKey: ["adminProducts"] });
-      setIsEditModalOpen(false);
+    mutationFn: ({ id, data }: { id: string; data: updateOrderStatusData }) =>
+      updateOrderStatus(id, data),
+    onSuccess: (updateOrder) => {
+      toast.success(`Status do pedido #${updateOrder._id.substring(0, 8)} atualizado para ${updateOrder.status}`);
+      queryClient.invalidateQueries({ queryKey: ["adminOrders"] });
     },
     onError: (error: ApiError) =>
-      handleError(error, "Erro ao atualizar produto."),
+      handleError(error, "Erro ao atualizar pedido."),
   });
 
-  const onSubmit = (data: ProductFormSchema) => {
-    const payload: ProductFormData = {
-      name: data.name,
-      description: data.description,
-      price: data.price,
-      size: data.size,
-      category: data.category,
-      inStock: data.inStock,
-      imageFile: data.imageFile ?? null, // força File | null
-      currentImageUrl: data.currentImageUrl ?? "", // força string | null
-    };
-
-    if (editingProduct) {
-      updateMutation.mutate({ id: editingProduct._id, data: payload });
-    } else {
-      createMutation.mutate(payload);
-    }
-  };
-
-  const handleOpenCreateModal = () => {
-    setEditingProduct(null);
-    setIsEditModalOpen(true);
-  };
-
-  const handleOpenEditModal = (product: Product) => {
-    setEditingProduct(product);
-    setIsEditModalOpen(true);
-  };
-
-  const handleDeleteClick = (product: Product) => {
-    setProductToDelete(product);
+  const handleDeleteClick = (order: Order) => {
+    setOrderToDelete(order);
     setIsDeleteModalOpen(true);
   };
 
   const handleConfirmDelete = () => {
-    if (productToDelete) {
-      deleteMutation.mutate(productToDelete._id);
+    if (orderToDelete) {
+      deleteMutation.mutate(orderToDelete._id);
     }
     setIsDeleteModalOpen(false);
-    setProductToDelete(null);
+    setOrderToDelete(null);
   };
 
-  if (isLoading)
+  const handleStatusChange = (orderId: string, newStatus: string) => {
+    updateMutation.mutate({ id: orderId, data: { status: newStatus as updateOrderStatusData["status"] } });
+  };
+
+  if (isLoading) {
     return <p className="text-center mt-8">Carregando produtos...</p>;
-  if (isError)
-    return <p className="text-red-500 text-center mt-8">{error?.message}</p>;
+  }
 
   return (
-    <>
-      <section className="py-8 flex flex-col">
+      <>
+        <section className="py-8 flex flex-col">
         <header className="flex flex-col items-center gap-4">
           <div className="title flex flex-col justify-center text-center gap-2">
             <h2 className="font-playfair text-3xl font-bold">
@@ -241,14 +109,18 @@ const Page: React.FC = () => {
           </div>
           <div className="actions flex items-center justify-between gap-4">
             <div className="search-container">
-              <Search  value={searchTerm} setValue={setSearchTerm}/>
+              <Search value={searchTerm} setValue={setSearchTerm} />
             </div>
           </div>
         </header>
 
         <div className="content mt-8">
+          {isError && <p>{(error as Error).message}</p>}
           <DashboardCard>
-            <table className="table-custom w-full text-center">
+            {filteredProducts?.length === 0 ? (
+              <p className="text-center">Nenhum pedido encontrado.</p>
+            ) : (
+              <table className="table-custom w-full text-center">
               <thead>
                 <tr>
                   <th>Cliente</th>
@@ -259,34 +131,28 @@ const Page: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredProducts?.map((product) => (
-                  <tr key={product._id}>
+                {filteredProducts?.map((order) => (
+                  <tr key={order._id}>
+                    <td onClick={() => {
+                      router.push(`/orders/${order._id}`);
+                    }} className="cursor-pointer">{order.user?.name || "Desconhecido"}</td>
+                    <td>R$ {order.totalPrice.toFixed(2)}</td>
                     <td>
-                      <Image
-                        src={product.imageUrl}
-                        width={48}
-                        height={48}
-                        alt={product.name}
-                        className="w-12 h-12 object-cover rounded-2xl border-2 border-primary-accent-light dark:border-primary-accent-dark"
-                      />
+                      <select name="status" value={order.status} onChange={(e) => handleStatusChange(order._id, e.target.value)}>
+                        <option value="pendente">Pendente</option>
+                        <option value="confirmado">Confirmado</option>
+                        <option value="cancelado">Cancelado</option>
+                      </select>
                     </td>
-                    <td>{product.name}</td>
-                    <td>R$ {product.price.toFixed(2)}</td>
-                    <td>{product.size}</td>
                     <td>
-                      {typeof product.category === "string"
-                        ? product.category
-                        : product.category?.name}
+                      {new Date(order.createdAt).toLocaleDateString("pt-BR", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                      })}
                     </td>
-                    <td>{product.inStock ? "Disponível" : "Indisponível"}</td>
                     <td>
-                      <button
-                        className="mr-2"
-                        onClick={() => handleOpenEditModal(product)}
-                      >
-                        <FaEdit />
-                      </button>
-                      <button onClick={() => handleDeleteClick(product)}>
+                      <button onClick={() => handleDeleteClick(order)}>
                         <FaTrash />
                       </button>
                     </td>
@@ -294,109 +160,19 @@ const Page: React.FC = () => {
                 ))}
               </tbody>
             </table>
+            )}
+            
           </DashboardCard>
         </div>
       </section>
-
       <ConfirmationModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
-        title="Excluir Produto"
-        message={`Você tem certeza que deseja excluir o produto ${productToDelete?.name}?`}
         onConfirm={handleConfirmDelete}
+        title="Excluir Pedido"
+        message="Tem certeza de que deseja excluir este pedido?"
       />
-
-      <SideForm isOpen={isEditModalOpen} setIsOpen={setIsEditModalOpen}>
-        <Form
-          title={editingProduct ? "Editar Produto" : "Criar Produto"}
-          textButton={editingProduct ? "Salvar" : "Criar"}
-          onSubmit={handleSubmit(onSubmit)}
-          isLoading={isSubmitting}
-          isSideBar
-        >
-          <HookFormInput
-            spanText="Nome do produto"
-            {...register("name")}
-            error={errors.name}
-          />
-          <HookFormInput
-            spanText="Descrição"
-            {...register("description")}
-            error={errors.description}
-          />
-          <HookFormInput
-            spanText="Preço"
-            type="number"
-            step="0.01"
-            {...register("price", { valueAsNumber: true })}
-            error={errors.price}
-          />
-          <div className="flex flex-col gap-2">
-            <span className="font-semibold">Tamanhos disponíveis</span>
-            <div className="flex gap-4">
-              {availableSizes.map((s) => (
-                <label
-                  key={s}
-                  className="flex items-center gap-1 font-semibold"
-                >
-                  <input
-                    className="w-4 aspect-square "
-                    type="checkbox"
-                    value={s}
-                    {...register("size")}
-                    defaultChecked={editingProduct?.size?.includes(s) || false}
-                  />
-                  {s}
-                </label>
-              ))}
-            </div>
-            {errors.size && (
-              <p className="text-red-500 text-sm">{errors.size.message}</p>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <span className="font-semibold">Categoria</span>
-            <select
-              {...register("category")}
-              className="border rounded-lg p-2"
-              defaultValue=""
-            >
-              <option value="" disabled>
-                Selecione uma categoria
-              </option>
-              {categories?.map((cat) => (
-                <option key={cat._id} value={cat._id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
-            {errors.category && (
-              <p className="text-red-500 text-sm">{errors.category.message}</p>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            <input type="checkbox" {...register("inStock")} />
-            <span>Disponível em estoque</span>
-          </div>
-          <ImageUploadField
-            label="Imagem do produto"
-            id="imageFile"
-            register={register("imageFile")}
-            error={errors.imageFile?.message}
-            currentImageUrl={editingProduct?.imageUrl || null}
-            onImageChange={(file) => {
-              if (file) {
-                reset({ ...getValues(), imageFile: file });
-              }
-            }}
-            onRemoveCurrentImage={() => {
-              reset({ ...getValues(), imageFile: null });
-            }}
-          />
-        </Form>
-      </SideForm>
-    </>
+      </>
   );
 };
 

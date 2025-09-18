@@ -38,8 +38,18 @@ export const getOrderById = async (id: string): Promise<Order> => {
     return response.data;
 }
 
+export const getOrdersForAdmin = async (): Promise<Order[]> => {
+    const response = await api.get("/orders/admin");
+    return response.data;
+}
+
+export const getOrderPyId = async (id: string): Promise<Order> => {
+    const response = await api.get(`/orders/${id}`);
+    return response.data;
+}
+
 export const updateOrderStatus = async (id: string, data: updateOrderStatusData): Promise<Order> => {
-    const response = await api.put(`/orders/${id}/status`, data);
+    const response = await api.put(`/orders/${id}`, data);
     return response.data;
 }
 
