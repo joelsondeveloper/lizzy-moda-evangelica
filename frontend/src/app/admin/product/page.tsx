@@ -3,7 +3,7 @@
 import GeneralButton from "@/components/layouts/ui/GeneralButton";
 import DashboardCard from "@/components/admin/DashboardCard";
 import Search from "@/components/layouts/ui/Search";
-import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
+import { FaPlus, FaEdit, FaTrash, FaShoppingBag } from "react-icons/fa";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -25,7 +25,6 @@ import * as z from "zod";
 import HookFormInput from "@/components/layouts/ui/HookFormInput";
 import ImageUploadField from "@/components/admin/ImageUploadField";
 import Image from "next/image";
-import { watch } from "fs";
 
 const productSchema = z.object({
   name: z
@@ -42,8 +41,12 @@ const productSchema = z.object({
   size: z.array(z.string()).min(1, "Selecione pelo menos um tamanho."),
   category: z.string().min(1, "Selecione uma categoria."),
   inStock: z.boolean(),
-  imageFile: z.instanceof(File).optional().nullable(),
-  currentImageUrl: z.string().optional().nullable(),
+  imageFiles: z
+    .array(z.instanceof(File))
+    .max(5, "No máximo 5 imagens.")
+    .optional()
+    .nullable(),
+  currentImageUrl: z.array(z.string()).optional().nullable(),
 });
 
 type ProductFormSchema = z.infer<typeof productSchema>;
@@ -60,7 +63,7 @@ const Page: React.FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
-  const[searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const {
     data: products,
@@ -86,13 +89,13 @@ const Page: React.FC = () => {
       product.size.some((size: string) => size.toLowerCase().includes(term))
     );
   });
-  
 
   const {
     register,
     handleSubmit,
     reset,
     setError,
+    setValue,
     getValues,
     formState: { errors, isSubmitting },
   } = useForm<ProductFormSchema>({
@@ -108,6 +111,8 @@ const Page: React.FC = () => {
         : [],
       category: "",
       inStock: true,
+      imageFiles: null,
+      currentImageUrl: null,
     },
   });
 
@@ -131,6 +136,8 @@ const Page: React.FC = () => {
             ? editingProduct.category
             : editingProduct.category._id,
         inStock: editingProduct.inStock,
+        imageFiles: null,
+        currentImageUrl: editingProduct.imageUrl,
       });
     } else {
       reset({
@@ -192,8 +199,8 @@ const Page: React.FC = () => {
       size: data.size,
       category: data.category,
       inStock: data.inStock,
-      imageFile: data.imageFile ?? null, // força File | null
-      currentImageUrl: data.currentImageUrl ?? "", // força string | null
+      imageFiles: data.imageFiles || null,
+      currentImageUrls: data.currentImageUrl || null,
     };
 
     if (editingProduct) {
@@ -245,7 +252,7 @@ const Page: React.FC = () => {
           </div>
           <div className="actions flex items-center justify-between gap-4">
             <div className="search-container">
-              <Search  value={searchTerm} setValue={setSearchTerm}/>
+              <Search value={searchTerm} setValue={setSearchTerm} />
             </div>
             <div className="btn-container">
               <GeneralButton
@@ -400,15 +407,8 @@ const Page: React.FC = () => {
             id="imageFile"
             register={register("imageFile")}
             error={errors.imageFile?.message}
-            currentImageUrl={editingProduct?.imageUrl || null}
-            onImageChange={(file) => {
-              if (file) {
-                reset({ ...getValues(), imageFile: file });
-              }
-            }}
-            onRemoveCurrentImage={() => {
-              reset({ ...getValues(), imageFile: null });
-            }}
+            setValue={setValue} // 🔑 obrigatórios
+            getValues={getValues} // 🔑 obrigatórios
           />
         </Form>
       </SideForm>

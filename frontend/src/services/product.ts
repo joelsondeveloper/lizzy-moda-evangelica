@@ -12,7 +12,7 @@ export interface Product {
         _id: string;
         name: string;
     };
-    imageUrl: string;
+    imageUrl: string[];
     inStock: boolean;
     createdAt: string;
     updatedAt: string;
@@ -24,9 +24,10 @@ export interface ProductFormData {
     price: number;
     size: string | string[];
     category: string;
-    imageFile: File | null;
     currentImageUrl: string;
     inStock: boolean;
+    imageFiles?: File[] | null;
+    currentImageUrls?: string[] | null;
 }
 
 export interface ProductFilterParams {
@@ -54,10 +55,10 @@ export const createProduct = async (data: ProductFormData): Promise<Product> => 
     formData.append("category", data.category);
     formData.append("inStock", data.inStock.toString());
 
-    if (data.imageFile) {
-        formData.append("image", data.imageFile);
-    } else if (data.currentImageUrl) {
-        formData.append("image", data.currentImageUrl);
+    if (data.imageFiles && data.imageFiles.length > 0) {
+        data.imageFiles.forEach((file) => {
+            formData.append("images", file);
+        })
     }
 
     const response = await api.post("/products", formData, {
@@ -77,12 +78,16 @@ export const updateProduct = async (id: string, data: ProductFormData): Promise<
     formData.append("category", data.category);
     formData.append("inStock", data.inStock.toString());
 
-    if (data.imageFile) {
-        formData.append("image", data.imageFile);
-    } else if (data.currentImageUrl) {
-        formData.append("image", data.currentImageUrl);
+    if (data.imageFiles && data.imageFiles.length > 0) {
+        data.imageFiles.forEach((file) => {
+            formData.append("images", file);
+        })
+    }
+
+    if (data.currentImageUrls && data.currentImageUrls.length > 0) {
+        formData.append("currentImageUrls", JSON.stringify(data.currentImageUrls));
     } else {
-        formData.append("image", "");
+        formData.append("currentImageUrls", "[]");
     }
 
     const response = await api.put(`/products/${id}`, formData, {

@@ -15,7 +15,6 @@ const router = express.Router();
 // middlewares
 const protect = require("../middleware/authMiddleware");
 const admin = require("../middleware/adminMiddleware");
-const upload = require("../middleware/upload");
 
 router.get("/", getProducts);
 router.get("/:id", getProductById);
