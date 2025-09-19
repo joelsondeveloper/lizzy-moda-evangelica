@@ -29,8 +29,14 @@ export interface ProductFormData {
     inStock: boolean;
 }
 
-export const getProducts = async (): Promise<Product[]> => {
-    const response = await api.get("/products");
+export interface ProductFilterParams {
+    displayType?: 'novidade' | 'destaque' | 'promocao' | 'categoria';
+    categoryId?: string;
+    limit?: number;
+}
+
+export const getProducts = async (params?: ProductFilterParams): Promise<Product[]> => {
+    const response = await api.get("/products", { params });
     return response.data;
 };
 

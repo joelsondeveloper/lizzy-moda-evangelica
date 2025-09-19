@@ -35,9 +35,9 @@ const Page: React.FC = () => {
   const filteredUsers = users?.filter((user) => {
     const term = searchTerm.toLowerCase();
     return (
-      user.id.toLowerCase().includes(term) ||
-      user.name.toLowerCase().includes(term) ||
-      user.email.toLowerCase().includes(term)
+      user._id?.toLowerCase().includes(term) ||
+      user.name?.toLowerCase().includes(term) ||
+      user.email?.toLowerCase().includes(term)
     );
   });
 
@@ -62,7 +62,7 @@ const Page: React.FC = () => {
 
   const handleConfirmDelete = () => {
     if (userToDelete) {
-      deleteMutation.mutate(userToDelete.id);
+      deleteMutation.mutate(userToDelete._id);
     }
     setIsDeleteModalOpen(false);
     setUserToDelete(null);
@@ -117,10 +117,10 @@ const Page: React.FC = () => {
                 </thead>
                 <tbody>
                   {filteredUsers?.map((user) => (
-                    <tr key={user.id}>
+                    <tr key={user._id}>
                       <td
                         onClick={() => {
-                          router.push(`/users/${user.id}`);
+                          router.push(`/users/${user._id}`);
                         }}
                         className="cursor-pointer"
                       >

@@ -3,13 +3,63 @@ const Category = require("../models/Category");
 const cloudinary = require("../config/cloudinary");
 const mongoose = require("mongoose");
 
+const  extractPublicId = (imageUrl) => {
+  if (!imageUrl || typeof imageUrl !== 'string' || !imageUrl.includes('/upload/')) {
+    return null;
+  }
+  const urlParts = imageUrl.split('/upload/');
+  if (urlParts.length > 1 && urlParts[1]) {
+    return urlParts[1]
+      .replace(/^v\d+\//, '')
+      .replace(/\.[^/.]+$/, '');
+  }
+  return null;
+};
+
 const getProducts = async (req, res) => {
   try {
-    const products = await Product.find().populate("category", "name");
+    const {
+      displayType,
+      categoryId,
+      limit
+    } = req.query;
+    let filter = {};
+    let sort = {};
+    let queryLimit = limit ? parseInt(limit) : 6;
+
+    if (displayType === 'novidade') {
+      filter = { inStock: true };
+      sort = { createdAt: -1 };
+    } else if (displayType === 'destaque') {
+      filter = { inStock: true };
+      sort = { createdAt: -1 };
+    } else if (displayType === 'promocao') {
+      filter = { inStock: true };
+      sort = { price: 1 };
+    } else if (displayType === 'categoria' && categoryId) {
+      if (!mongoose.Types.ObjectId.isValid(categoryId)) {
+        return res.status(400).json({ message: "Categoria invalida" });
+      }
+      filter.category = categoryId;
+    }
+      filter.inStock = true
+      let productQuery = Product.find(filter);
+
+    if (Object.keys(sort).length > 0) {
+      productQuery = productQuery.sort(sort);
+    } else {
+    productQuery = productQuery.sort({ createdAt: -1 })
+    }
+
+    if (queryLimit > 0) {
+      productQuery = productQuery.limit(queryLimit);
+    }
+
+    const products = await productQuery.populate("category", "name");
     res.json(products);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Erro ao buscar produtos" });
+    res.status(500).json({ message: "Erro ao buscar produtos", error: error.message });
   }
 };
 
@@ -33,7 +83,25 @@ const getProductById = async (req, res) => {
 const createProduct = async (req, res) => {
   try {
     const { name, description, price, size, category, inStock } = req.body;
-    const imageUrl = req.file ? req.file.path : "";
+    const imageUrls = [];
+
+    if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+      for (const file of req.files) {
+        try {
+          const result = await cloudinary.uploader.upload(file.path);
+          imageUrls.push(result.secure_url);
+        } catch (error) {
+          console.error("Erro ao enviar imagem para Cloudinary:", error);
+          return res
+            .status(500)
+            .json({ message: "Erro ao enviar imagem para Cloudinary" });
+        }
+      }
+    } else {
+      if (Product.schema.path("imageUrl").isRequired) {
+        return res.status(400).json({ message: "Imagem obrigatoria" });
+      }
+    }
 
     if (!mongoose.Types.ObjectId.isValid(category)) {
       return res.status(400).json({ message: "Categoria invalida" });
@@ -49,7 +117,7 @@ const createProduct = async (req, res) => {
       price,
       size,
       category,
-      imageUrl,
+      imageUrl: imageUrls,
       inStock,
     });
 
@@ -67,23 +135,45 @@ const updateProduct = async (req, res) => {
   try {
     const { name, description, price, size, category, inStock } = req.body;
 
+    const currentImageUrlsToKeep = req.body.currentImageUrls ? JSON.parse(req.body.currentImageUrls) : [];
+
     const product = await Product.findById(req.params.id);
 
     if (!product) {
       return res.status(404).json({ message: "Produto nao encontrado" });
     }
 
-    if (req.file) {
-      if (product.imageUrl) {
-        const urlParts = product.imageUrl.split("/upload/");
-
-        const publicId = urlParts[1]
-          .replace(/^v\d+\//, "")
-          .replace(/\.[^/.]+$/, "");
-
-        await cloudinary.uploader.destroy(publicId);
+    const newImageUrls = [];
+    if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+      for (const file of req.files) {
+        try {
+          const result = await cloudinary.uploader.upload(file.path);
+          newImageUrls.push(result.secure_url);
+        } catch (error) {
+          console.error("Erro ao enviar imagem para Cloudinary:", error);
+          return res
+            .status(500)
+            .json({ message: "Erro ao enviar imagem para Cloudinary" });
+        }
       }
-      product.imageUrl = req.file.path;
+    }
+
+    const finalImageUrls = [...currentImageUrlsToKeep, ...newImageUrls];
+
+    for (const oldUrl of product.imageUrl) {
+      if (!finalImageUrls.includes(oldUrl)) {
+          const publicId = extractPublicId(oldUrl);
+          if (publicId) {
+            try {
+              await cloudinary.uploader.destroy(publicId);
+            } catch (error) {
+              console.error("Erro ao excluir imagem da Cloudinary:", error);
+              return res
+                .status(500)
+                .json({ message: "Erro ao excluir imagem da Cloudinary" });
+            }
+          }
+      }
     }
 
     if (category) {
@@ -114,6 +204,8 @@ const updateProduct = async (req, res) => {
 
     product.inStock = inStock !== undefined ? inStock : product.inStock;
 
+    product.imageUrl = finalImageUrls;
+
     const updatedProduct = await product.save();
     res.json(updatedProduct);
   } catch (error) {
@@ -130,25 +222,17 @@ const deleteProduct = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: "Produto nao encontrado" });
     }
-    if (product.imageUrl) {
-      const urlParts = product.imageUrl.split("/upload/");
-
-      if (urlParts.length > 1 && urlParts[1]) {
-        const publicId = urlParts[1]
-          .replace(/^v\d+\//, "")
-          .replace(/\.[^/.]+$/, "");
-
+    if (product.imageUrl && Array.isArray(product.imageUrl) && product.imageUrl.length > 0) {
+      for (const imageUrl of product.imageUrl) {
+        const publicId = extractPublicId(imageUrl);
         if (publicId) {
           try {
-            
             await cloudinary.uploader.destroy(publicId);
-            console.log(`Imagem do produto ${product._id} excluida do Cloudinary.`);
-
           } catch (error) {
-            console.error(
-              `Erro ao excluir imagem do produto ${product._id} do Cloudinary: ${error}`,
-              error
-            )
+            console.error("Erro ao excluir imagem da Cloudinary:", error);
+            return res
+              .status(500)
+              .json({ message: "Erro ao excluir imagem da Cloudinary" });
           }
         }
       }
