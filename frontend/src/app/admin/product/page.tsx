@@ -46,7 +46,7 @@ const productSchema = z.object({
     .max(5, "No máximo 5 imagens.")
     .optional()
     .nullable(),
-  currentImageUrl: z.array(z.string()).optional().nullable(),
+  currentImageUrls: z.array(z.string()).optional().nullable(),
 });
 
 type ProductFormSchema = z.infer<typeof productSchema>;
@@ -98,6 +98,7 @@ const Page: React.FC = () => {
     setValue,
     getValues,
     formState: { errors, isSubmitting },
+    watch,
   } = useForm<ProductFormSchema>({
     resolver: zodResolver(productSchema),
     defaultValues: {
@@ -112,12 +113,18 @@ const Page: React.FC = () => {
       category: "",
       inStock: true,
       imageFiles: null,
-      currentImageUrl: null,
+      currentImageUrls: null,
     },
   });
 
   useEffect(() => {
     if (editingProduct) {
+      console.log("Page.tsx: editingProduct completo:", editingProduct);
+      console.log(
+        "Page.tsx: Valor de editingProduct.imageUrl:",
+        editingProduct.imageUrl
+      );
+
       const sizes =
         editingProduct.size?.map((s: any) => {
           // Se for array, pega o primeiro elemento
@@ -137,7 +144,7 @@ const Page: React.FC = () => {
             : editingProduct.category._id,
         inStock: editingProduct.inStock,
         imageFiles: null,
-        currentImageUrl: editingProduct.imageUrl,
+        currentImageUrls: editingProduct.imageUrl,
       });
     } else {
       reset({
@@ -200,7 +207,7 @@ const Page: React.FC = () => {
       category: data.category,
       inStock: data.inStock,
       imageFiles: data.imageFiles || null,
-      currentImageUrls: data.currentImageUrl || null,
+      currentImageUrls: data.currentImageUrls || null,
     };
 
     if (editingProduct) {
@@ -286,7 +293,7 @@ const Page: React.FC = () => {
                   <tr key={product._id}>
                     <td>
                       <Image
-                        src={product.imageUrl}
+                        src={product.imageUrl[0]}
                         width={48}
                         height={48}
                         alt={product.name}
@@ -405,8 +412,9 @@ const Page: React.FC = () => {
           <ImageUploadField
             label="Imagem do produto"
             id="imageFile"
-            register={register("imageFile")}
-            error={errors.imageFile?.message}
+            name="imageFiles"
+            rhfRegister={register("imageFiles")}
+            error={errors.imageFiles?.message}
             setValue={setValue} // 🔑 obrigatórios
             getValues={getValues} // 🔑 obrigatórios
           />

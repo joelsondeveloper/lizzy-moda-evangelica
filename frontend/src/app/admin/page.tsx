@@ -278,7 +278,7 @@ const Page: React.FC = () => {
                 <tr className="flex justify-between" key={product._id}>
                   <td>
                     <div className="img-container relative w-15 aspect-square rounded-2xl">
-                      <Image src={product.imageUrl} alt={product.name} fill className="h-12 w-12 aspect-square rounded-2xl object-cover"/>
+                      <Image src={product.imageUrl[0]} alt={product.name} fill className="h-12 w-12 aspect-square rounded-2xl object-cover"/>
                     </div>
                   </td>
                   <td className="flex flex-col gap-1">

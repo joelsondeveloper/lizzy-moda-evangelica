@@ -57,3 +57,8 @@ export const deleteOrder = async (id: string): Promise<{ message: string }> => {
     const response = await api.delete(`/orders/${id}`);
     return response.data;
 }
+
+export const createOrder = async (): Promise<Order> => {
+    const response = await api.post("/orders");
+    return response.data;
+}

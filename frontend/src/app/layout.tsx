@@ -4,6 +4,7 @@
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "../context/AuthContext";
+import { CartProvider } from "@/context/CartContext";
 
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
@@ -57,17 +58,19 @@ export default function RootLayout({
         <AuthProvider>
           <ToastProvider>
             <QueryProvider>
-              {!pathAdmin && <Header sideDrawer={setWichSideDrawer} />}
-              <main className={`relative ${!pathAdmin ? "pt-32" : ""}`}>
-                {children}
-                <SideDrawer
-                  isOpen={wichSideDrawer !== "none"}
-                  setIsOpen={setWichSideDrawer}
-                >
-                  {wichSideDrawer === "auth" && <AuthDrawer />}
-                  {wichSideDrawer === "cart" && <CartDrawer />}
-                </SideDrawer>
-              </main>
+              <CartProvider>
+                {!pathAdmin && <Header sideDrawer={setWichSideDrawer} />}
+                <main className={`relative ${!pathAdmin ? "pt-32" : ""}`}>
+                  {children}
+                  <SideDrawer
+                    isOpen={wichSideDrawer !== "none"}
+                    setIsOpen={setWichSideDrawer}
+                  >
+                    {wichSideDrawer === "auth" && <AuthDrawer />}
+                    {wichSideDrawer === "cart" && <CartDrawer />}
+                  </SideDrawer>
+                </main>
+              </CartProvider>
             </QueryProvider>
           </ToastProvider>
         </AuthProvider>

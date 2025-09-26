@@ -89,3 +89,15 @@ button, select {
   font-size: 0.9rem;
   font-weight: 500;
 }
+
+.skeleton {
+  background: #ccc;
+  border-radius: 8px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.4; }
+  100% { opacity: 1; }
+}

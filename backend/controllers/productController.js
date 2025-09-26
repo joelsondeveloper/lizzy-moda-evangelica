@@ -16,6 +16,20 @@ const  extractPublicId = (imageUrl) => {
   return null;
 };
 
+const normalizeSizes = (size) => {
+  if (!size) return [];
+  if (Array.isArray(size)) return size.map(s => s.trim());
+  if (typeof size === "string") {
+    try {
+      const parsed = JSON.parse(size);
+      if (Array.isArray(parsed)) return parsed.map(s => s.trim());
+    } catch (e) {
+      return size.split(",").map(s => s.trim());
+    }
+  }
+  return [];
+};
+
 const getProducts = async (req, res) => {
   try {
     const {
@@ -115,7 +129,7 @@ const createProduct = async (req, res) => {
       name,
       description,
       price,
-      size,
+      size: normalizeSizes(size),
       category,
       imageUrl: imageUrls,
       inStock,
@@ -198,8 +212,7 @@ const updateProduct = async (req, res) => {
     product.price = price !== undefined ? price : product.price;
 
     if (size !== undefined) {
-      product.size =
-        typeof size === "string" ? size.split(",").map((s) => s.trim()) : size;
+      product.size = normalizeSizes(size)
     }
 
     product.inStock = inStock !== undefined ? inStock : product.inStock;

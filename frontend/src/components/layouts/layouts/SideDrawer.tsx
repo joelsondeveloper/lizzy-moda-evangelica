@@ -6,6 +6,7 @@ import { sideProps } from "@/app/layout";
 import GrayScreen from "../ui/GrayScreen";
 import ConfirmationModal from "../ui/ConfirmationModal";
 import { useAuth } from "@/context/AuthContext";
+import { useCart } from "@/context/CartContext";
 
 import React, { useState, ReactElement } from "react";
 
@@ -17,12 +18,14 @@ interface SideDrawerProps {
 
 interface setIsConfirmingProps {
   setIsConfirming: React.Dispatch<React.SetStateAction<boolean>>;
+  isOpen: boolean;
 }
 
 const SideDrawer = ({ children, isOpen, setIsOpen }: SideDrawerProps) => {
 
   const [isConfirming, setIsConfirming] = useState<boolean>(false);
   const { logout } = useAuth();
+  const {updateItemQuantityLocal} = useCart();
 
   if (isConfirming) setIsOpen("none");
 
@@ -34,13 +37,16 @@ const SideDrawer = ({ children, isOpen, setIsOpen }: SideDrawerProps) => {
         }`}
       >
         <div className="btn-container absolute top-4 right-4">
-          <NavButton size="w-8" handleClick={() => setIsOpen("none")}>
+          <NavButton size="w-8" handleClick={() => {
+            setIsOpen("none");
+            updateItemQuantityLocal();
+          }}>
             <IoClose size="50%" />
           </NavButton>
         </div>
         {React.Children.map(children, (child) => {
           if (React.isValidElement(child)) {
-            return React.cloneElement(child as ReactElement<setIsConfirmingProps>, { setIsConfirming });
+            return React.cloneElement(child as ReactElement<setIsConfirmingProps>, { setIsConfirming, isOpen });
           }
           return child;
         })}
