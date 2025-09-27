@@ -17,6 +17,6 @@ router
   .put(protect, updateCartItem)
   .delete(protect, clearCart);
 
-router.route("/:productId").delete(protect, removeFromCart);
+router.route("/:productId/:size").delete(protect, removeFromCart);
 
 module.exports = router;

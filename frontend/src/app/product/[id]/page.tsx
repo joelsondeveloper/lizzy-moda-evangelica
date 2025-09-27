@@ -204,7 +204,7 @@ const Page = () => {
           </div>
         </div>
         <div className="actions w-full">
-          <GeneralButton color="bg-primary-accent-light dark:bg-primary-accent-dark text-button-text-light dark:text-button-text-dark hover:bg-primary-accent-dark dark:hover:bg-primary-accent-light" border="rounded-xl" onClick={handleAddToCart}> Comprar </GeneralButton>
+          <GeneralButton color="bg-primary-accent-light dark:bg-primary-accent-dark text-button-text-light dark:text-button-text-dark hover:bg-primary-accent-dark dark:hover:bg-primary-accent-light" border="rounded-xl" onClick={handleAddToCart}> Adicionar ao carrinho </GeneralButton>
         </div>
       </div>
     </section>

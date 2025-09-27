@@ -11,6 +11,7 @@ export interface CartItem {
     _id: string;
     product: ProductInCart;
     quantity: number;
+    size: string;
 }
 
 export interface Cart {
@@ -24,11 +25,13 @@ export interface Cart {
 interface AddToCartData {
     productId: string;
     quantity: number;
+    size?: string;
 }
 
 interface UpdateCartItemData {
     productId: string;
     quantity: number;
+    size: string;
 }
 
 export const getCart = async (): Promise<Cart> => {
@@ -36,18 +39,18 @@ export const getCart = async (): Promise<Cart> => {
     return response.data;
 };
 
-export const addToCart = async (productId: string, quantity: number): Promise<Cart> => {
-    const response = await api.post(`/cart`, { productId, quantity } as AddToCartData);
+export const addToCart = async (productId: string, quantity: number, size?: string): Promise<Cart> => {
+    const response = await api.post(`/cart`, { productId, quantity, size } as AddToCartData);
     return response.data;
 };
 
-export const updateCartItem = async (productId: string, quantity: number): Promise<Cart> => {
-    const response = await api.put(`/cart`, { productId, quantity } as UpdateCartItemData);
+export const updateCartItem = async (productId: string, quantity: number, size: string): Promise<Cart> => {
+    const response = await api.put(`/cart`, { productId, quantity, size } as UpdateCartItemData);
     return response.data;
 };
 
-export const removeItem = async (productId: string): Promise<Cart> => {
-    const response = await api.delete(`/cart/${productId}`);
+export const removeItem = async (productId: string, size: string): Promise<Cart> => {
+    const response = await api.delete(`/cart/${productId}/${size}`);
     return response.data;
 };
 

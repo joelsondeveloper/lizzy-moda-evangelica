@@ -8,6 +8,7 @@ export interface OrderItem {
     }
     quantity: number;
     price: number;
+    size: string;
 }
 
 export interface Order {
