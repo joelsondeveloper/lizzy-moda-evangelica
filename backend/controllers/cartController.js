@@ -112,7 +112,7 @@ const updateCartItem = async (req, res) => {
     );
 
     const itemIndex = cart.items.findIndex(
-      (item) => item.product.toString() === productId && item.size === size
+      (item) => item.product.toString() === productId
     );
 
     if (itemIndex === -1) {
@@ -124,6 +124,9 @@ const updateCartItem = async (req, res) => {
       cart.items.splice(itemIndex, 1);
     } else {
       cart.items[itemIndex].quantity = quantity;
+      if (size) {
+        cart.items[itemIndex].size = size;
+      }
     }
     await cart.save();
 

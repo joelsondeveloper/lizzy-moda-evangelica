@@ -20,30 +20,29 @@ const ProductItemCart: React.FC<ProductItemCartProps> = ({item, isOpen}) => {
 
   const [localQuantity, setLocalQuantity] = useState(item.quantity);
 
+  const [localSize, setLocalSize] = useState(item.size);
+
   useEffect(() => {
     setLocalQuantity(item.quantity);
   }, [item.quantity]);
-
-  console.log(item);
 
   const handleDecreaseQuantity = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     if (localQuantity > 1) {
       setLocalQuantity(localQuantity - 1);
-      modifyLocalCart(item.product._id, -1);
+      modifyLocalCart(item.product._id, -1, item.size);
     }
   };
 
   const handleIncreaseQuantity = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     setLocalQuantity(localQuantity + 1);
-    modifyLocalCart(item.product._id, 1);
+    modifyLocalCart(item.product._id, 1, item.size);
   };
 
   const handleChangeSize = async (e: React.ChangeEvent<HTMLSelectElement>) => {
   e.stopPropagation();
-  const newSize = e.target.value;
-  await updateItemQuantity(item.product._id, localQuantity, newSize);
+  updateItemQuantity(item.product._id, localQuantity, e.target.value);
 };
 
   const handleRemoveItem = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -72,7 +71,7 @@ const ProductItemCart: React.FC<ProductItemCartProps> = ({item, isOpen}) => {
           <button className="w-5 aspect-square text-error-light dark:text-error-dark" onClick={handleRemoveItem}>
             <HiOutlineTrash size="100%" />
           </button>
-          <select value={item.size} onChange={handleChangeSize}>
+          <select value={localSize} onChange={handleChangeSize}>
             {item.product.size.map((size) => (
               <option key={size} value={size}>{size}</option>
             ))}
