@@ -125,7 +125,7 @@ const Page: React.FC = () => {
         editingProduct.imageUrl
       );
 
-      const sizes = editingProduct.size || []
+      const sizes = editingProduct.size || [];
 
       reset({
         name: editingProduct.name,
@@ -262,7 +262,7 @@ const Page: React.FC = () => {
                 onClick={handleOpenCreateModal}
               >
                 <FaPlus />
-                <span className="hidden md:block">Nova Categoria</span>
+                <span className="hidden md:block">Novo Produto</span>
               </GeneralButton>
             </div>
           </div>
@@ -296,7 +296,11 @@ const Page: React.FC = () => {
                     </td>
                     <td>{product.name}</td>
                     <td>R$ {product.price.toFixed(2)}</td>
-                    <td>{product.size}</td>
+                    <td>
+                      {Array.isArray(product.size)
+                        ? product.size.join(", ")
+                        : product.size}
+                    </td>
                     <td>
                       {typeof product.category === "string"
                         ? product.category

@@ -22,7 +22,7 @@ const ProductCard = ({ product }: { product: Product }) => {
   const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     try {
-      addItem(product._id, 1);
+      addItem(product._id, 1, product.size[0]);
     } catch (error) {
       console.log("Erro ao adicionar item ao carrinho:", error);
       toast.error("Erro ao adicionar item ao carrinho.");

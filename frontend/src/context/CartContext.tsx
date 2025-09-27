@@ -24,12 +24,14 @@ export interface ProductInCart {
   name: string;
   price: number;
   imageUrl: string[];
+  size: string[];
 }
 
 export interface CartItem {
   _id: string;
   product: ProductInCart;
   quantity: number;
+  size: string;
 }
 
 export interface CartContextType {
@@ -38,9 +40,9 @@ export interface CartContextType {
   totalPrice: number;
   isLoading: boolean;
   errorCart: string | null;
-  addItem: (productId: string, quantity: number) => Promise<void>;
-  updateItemQuantity: (productId: string, quantity: number) => Promise<void>;
-  removeItem: (productId: string) => Promise<void>;
+  addItem: (productId: string, quantity: number, size?: string) => Promise<void>;
+  updateItemQuantity: (productId: string, quantity: number, size?: string) => Promise<void>;
+  removeItem: (productId: string, size?: string) => Promise<void>;
   modifyLocalCart: (productId: string, quantity: number) => void;
   updateItemQuantityLocal: () => void;
   localCart: CartItem[];
@@ -111,7 +113,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     fetchUserCart();
   }, [fetchUserCart]);
 
-  const addItem = async (productId: string, quantity: number = 1) => {
+  const addItem = async (productId: string, quantity: number = 1, size?: string) => {
     if (!isAuthenticated) {
       toast.error("Você precisa estar logado para adicionar produtos ao carrinho.");
       return;
@@ -119,7 +121,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     setIsLoadingCart(true);
     try {
 
-        const response = await addToCart(productId, quantity);
+        const response = await addToCart(productId, quantity, size);
         setCart(response);
         const itemsCount = response.items.reduce((total, item) => total + item.quantity, 0);
         const totalVal = response.items.reduce((total, item) => total + (item.product.price * item.quantity), 0);
@@ -150,14 +152,14 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   });
 };
 
-  const updateItemQuantity = async (productId: string, quantity: number) => {
+  const updateItemQuantity = async (productId: string, quantity: number, size?: string) => {
     if (!isAuthenticated) {
       toast.error("Você precisa estar logado para atualizar o carrinho.");
       return;
     }
     setIsLoadingCart(true);
     try {
-        const response = await updateCartItem(productId, quantity);
+        const response = await updateCartItem(productId, quantity, size);
         setCart(response);
         const itemsCount = response.items.reduce((total, item) => total + item.quantity, 0);
         const totalVal = response.items.reduce((total, item) => total + (item.product.price * item.quantity), 0);
@@ -184,14 +186,14 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     setLocalCart([]);
   }
 
-  const removeItem = async (productId: string) => {
+  const removeItem = async (productId: string, size?: string) => {
     if (!isAuthenticated) {
       toast.error("Você precisa estar logado para remover produtos do carrinho.");
       return;
     }
     setIsLoadingCart(true);
     try {
-        const response = await removeItem(productId);
+        const response = await removeItem(productId, size);
         setCart(response);
         const itemsCount = response.items.reduce((total, item) => total + item.quantity, 0);
         const totalVal = response.items.reduce((total, item) => total + (item.product.price * item.quantity), 0);

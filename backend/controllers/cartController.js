@@ -100,6 +100,17 @@ const updateCartItem = async (req, res) => {
     if (!cart) {
       return res.status(404).json({ message: "Carrinho nao encontrado" });
     }
+
+    console.log("BODY:", req.body);
+    console.log(
+      "CART ITEMS:",
+      cart.items.map((i) => ({
+        product: i.product.toString(),
+        size: i.size,
+        qty: i.quantity,
+      }))
+    );
+
     const itemIndex = cart.items.findIndex(
       (item) => item.product.toString() === productId && item.size === size
     );
