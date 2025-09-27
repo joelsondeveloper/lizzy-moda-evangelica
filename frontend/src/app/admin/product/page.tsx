@@ -125,13 +125,7 @@ const Page: React.FC = () => {
         editingProduct.imageUrl
       );
 
-      const sizes =
-        editingProduct.size?.map((s: any) => {
-          // Se for array, pega o primeiro elemento
-          const val = Array.isArray(s) ? s[0] : s;
-          // Remove colchetes, aspas e espaços
-          return val.replace(/[\[\]"]/g, "").trim();
-        }) || [];
+      const sizes = editingProduct.size || []
 
       reset({
         name: editingProduct.name,

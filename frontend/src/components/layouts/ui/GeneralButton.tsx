@@ -4,7 +4,7 @@ interface Props {
     children: React.ReactNode
     color?: string
     border?: string
-    onClick?: () => void | MouseEventHandler
+    onClick?: MouseEventHandler<HTMLButtonElement>
     isLoading?: boolean
 }
 

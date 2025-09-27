@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { getProductById, Product } from "@/services/product";
 import { useCart } from "@/context/CartContext";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { toast } from "react-toastify";
 import Image from "next/image";
 import GeneralButton from "@/components/layouts/ui/GeneralButton";
@@ -28,6 +28,12 @@ const Page = () => {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [mainImageIndex, setMainImageIndex] = useState(0);
 
+  const [isZoomActive, setIsZoomActive] = useState(false);
+  const [bgPosition, setBgPosition] = useState("0% 0%");
+  const imageContainerRef = useRef<HTMLDivElement>(null);
+
+  const [sizeSelected, setSizeSelected] = useState(false);
+
   useEffect(() => {
     if (product) {
       setMainImageIndex(0);
@@ -35,7 +41,23 @@ const Page = () => {
     }
   }, [product]);
 
-  console.log(product);
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!imageContainerRef.current) return;
+
+    const { left, top, width, height } =
+      imageContainerRef.current.getBoundingClientRect();
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+    setBgPosition(`${x}% ${y}%`);
+  }, []);
+
+  const handleMouseEnter = useCallback(() => {
+    setIsZoomActive(true);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setIsZoomActive(false);
+  }, []);
 
   const handleAddToCart = async () => {
     if (!product) return;
@@ -45,7 +67,6 @@ const Page = () => {
     }
     try {
       await addItem(product._id, 1);
-      toast.success("Item adicionado ao carrinho com sucesso.");
     } catch (error) {
       console.error("Erro ao adicionar item ao carrinho:", error);
       toast.error("Erro ao adicionar item ao carrinho.");
@@ -99,6 +120,17 @@ const Page = () => {
         <div
           className="mainImage relative w-[clamp(20rem,calc(20rem+11.25rem*((100vw-20rem)/60rem)),31.25rem)]
            aspect-square"
+          ref={imageContainerRef}
+          onMouseMove={handleMouseMove}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          style={{
+            backgroundImage: `url(${product.imageUrl[mainImageIndex]})`,
+            backgroundSize: isZoomActive ? "200%" : "cover",
+            backgroundPosition: isZoomActive ? bgPosition : "center",
+            backgroundRepeat: "no-repeat",
+            transition: "background-size 0.3s ease",
+          }}
         >
           {product.imageUrl[mainImageIndex] &&
             product.imageUrl.map((imageUrl, index) => (
@@ -108,9 +140,8 @@ const Page = () => {
                 alt={product.name}
                 fill
                 sizes="100%"
-                className={`${
-                  index === mainImageIndex ? "active" : "opacity-0"
-                } transition duration-500 ease-in-out`}
+                priority={index === mainImageIndex}
+                className="hidden"
               />
             ))}
         </div>
@@ -139,29 +170,41 @@ const Page = () => {
         </div>
         <div className="sizes w-full flex flex-col gap-3">
           <p className="font-semibold text-text-primary-light dark:text-text-primary-dark">
-            Tamanhos:
+            Escolha os tamanhos:
           </p>
-          <div className="size-container flex gap-3">
-            {product.size.map((size) => (
-              <input
-                key={size}
-                type="radio"
-                name="size"
-                id={size}
-                value={size}
-                className="hidden"
-              />
-            ))}
-            {product.size.map((size) => (
-              <label
-                key={size}
-                htmlFor={size}
-                className="text-text-secondary-light dark:text-text-secondary-dark cursor-pointer"
-              >
-                {size}
-              </label>
-            ))}
+          <div className="size-container flex gap-4 w-full">
+            <div className="buttons flex gap-3">
+              {product.size.map((size) => (
+                <input
+                  key={size}
+                  type="radio"
+                  name="size"
+                  id={size}
+                  value={size}
+                  className="hidden"
+                  checked={selectedSize === size}
+                  onChange={(e) => setSelectedSize(e.target.value)}
+                />
+              ))}
+              {product.size.map((size) => (
+                <label
+                  key={size}
+                  htmlFor={size}
+                  className={`w-12 h-10 flex justify-center items-center rounded-md cursor-pointer border border-text-secondary-light dark:border-text-secondary-dark ${
+                    selectedSize === size
+                      ? "bg-primary-accent-light dark:bg-primary-accent-dark text-white"
+                      : "bg-transparent text-text-secondary-light dark:text-text-secondary-dark"
+                  }`}
+                  onClick={() => setSelectedSize(size)}
+                >
+                  {size}
+                </label>
+              ))}
+            </div>
           </div>
+        </div>
+        <div className="actions w-full">
+          <GeneralButton color="bg-primary-accent-light dark:bg-primary-accent-dark text-button-text-light dark:text-button-text-dark hover:bg-primary-accent-dark dark:hover:bg-primary-accent-light" border="rounded-xl" onClick={handleAddToCart}> Comprar </GeneralButton>
         </div>
       </div>
     </section>

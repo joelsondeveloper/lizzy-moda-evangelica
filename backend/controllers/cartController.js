@@ -25,10 +25,18 @@ const getCart = async (req, res) => {
 
 const addToCart = async (req, res) => {
   try {
-    const { productId, quantity } = req.body;
+    const { productId, quantity, size } = req.body;
 
     if (typeof quantity !== "number" || quantity < 1) {
       return res.status(400).json({ message: "Quantidade invalida" });
+    }
+
+    if (!size) {
+      if (product.size && product.size.length > 0) {
+        size = product.size[0];
+      } else {
+        return res.status(400).json({ message: "Tamanho invalido" });
+      }
     }
 
     if (!mongoose.Types.ObjectId.isValid(productId)) {
@@ -45,12 +53,12 @@ const addToCart = async (req, res) => {
     }
 
     const itemIndex = cart.items.findIndex(
-      (item) => item.product.toString() === productId
+      (item) => item.product.toString() === productId && item.size === size
     );
     if (itemIndex > -1) {
       cart.items[itemIndex].quantity += quantity;
     } else {
-      cart.items.push({ product: productId, quantity });
+      cart.items.push({ product: productId, quantity, size });
     }
 
     await cart.save();
@@ -75,7 +83,7 @@ const addToCart = async (req, res) => {
 };
 
 const updateCartItem = async (req, res) => {
-  const { productId, quantity } = req.body;
+  const { productId, quantity, size } = req.body;
 
   if (typeof quantity !== "number" || quantity < 0) {
     return res.status(400).json({
@@ -93,7 +101,7 @@ const updateCartItem = async (req, res) => {
       return res.status(404).json({ message: "Carrinho nao encontrado" });
     }
     const itemIndex = cart.items.findIndex(
-      (item) => item.product.toString() === productId
+      (item) => item.product.toString() === productId && item.size === size
     );
 
     if (itemIndex === -1) {
@@ -121,7 +129,7 @@ const updateCartItem = async (req, res) => {
 
 const removeFromCart = async (req, res) => {
   try {
-    const { productId } = req.params;
+    const { productId, size } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(productId)) {
       return res.status(400).json({ message: "ID do Produto invalido" });
@@ -135,16 +143,20 @@ const removeFromCart = async (req, res) => {
     const initialItemCount = cart.items.length;
 
     cart.items = cart.items.filter(
-      (item) => item.product.toString() !== productId
+      (item) => item.product.toString() !== productId || item.size !== size
     );
 
     if (cart.items.length === initialItemCount) {
-      return res.status(404).json({ message: "Item nao encontrado no carrinho" });
+      return res
+        .status(404)
+        .json({ message: "Item nao encontrado no carrinho" });
     }
 
     await cart.save();
 
-     const populateCart = await populateCartItems(Cart.findOne({ user: req.user._id }));
+    const populateCart = await populateCartItems(
+      Cart.findOne({ user: req.user._id })
+    );
 
     res.json(populateCart);
   } catch (error) {
@@ -162,7 +174,9 @@ const clearCart = async (req, res) => {
     cart.items = [];
     await cart.save();
 
-    const populateCart = await populateCartItems(Cart.findOne({ user: req.user._id }));
+    const populateCart = await populateCartItems(
+      Cart.findOne({ user: req.user._id })
+    );
 
     res.json(populateCart);
   } catch (error) {
