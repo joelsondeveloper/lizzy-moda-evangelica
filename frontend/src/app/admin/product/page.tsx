@@ -25,6 +25,7 @@ import * as z from "zod";
 import HookFormInput from "@/components/layouts/ui/HookFormInput";
 import ImageUploadField from "@/components/admin/ImageUploadField";
 import Image from "next/image";
+import { ALL_SIZES } from "@/services/product";
 
 const productSchema = z.object({
   name: z
@@ -55,7 +56,7 @@ type ApiError = { response?: { data?: { message?: string } } };
 const Page: React.FC = () => {
   const queryClient = useQueryClient();
 
-  const availableSizes = ["P", "M", "G", "GG", "GGG"];
+  const availableSizes = [...ALL_SIZES];
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
@@ -359,9 +360,9 @@ const Page: React.FC = () => {
             {...register("price", { valueAsNumber: true })}
             error={errors.price}
           />
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 w-[60%] mx-auto">
             <span className="font-semibold">Tamanhos disponíveis</span>
-            <div className="flex gap-4">
+            <div className="flex gap-4 flex-wrap">
               {availableSizes.map((s) => (
                 <label
                   key={s}

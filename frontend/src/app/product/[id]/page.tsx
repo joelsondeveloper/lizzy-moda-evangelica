@@ -66,7 +66,7 @@ const Page = () => {
       return;
     }
     try {
-      await addItem(product._id, 1);
+      await addItem(product._id, 1, selectedSize);
     } catch (error) {
       console.error("Erro ao adicionar item ao carrinho:", error);
       toast.error("Erro ao adicionar item ao carrinho.");

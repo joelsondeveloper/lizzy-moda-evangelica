@@ -157,34 +157,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen }) => {
               />
             ))}
           </div>
-          <footer className="absolute bottom-0 left-0 w-full p-5 flex flex-col gap-2">
-            <div className="total flex flex-col gap-2 px-2">
-              <div className="item-count flex justify-between text-sm text-text-primary-light dark:text-text-primary-dark">
-                <p className="font-medium">Total de itens:</p>
-                <p className="font-semibold">{totalItems + localCartTotalQuantity}</p>
-              </div>
-              <div className="subtotal flex justify-between text-sm">
-                <p className="font-medium text-text-primary-light dark:text-text-primary-dark">Subtotal:</p>
-                <p className="font-bold">${(totalPrice + LocalCartTotalPrice).toFixed(2)}</p>
-              </div>
-            </div>
-            <div className="actions text-center flex flex-col gap-3">
-              <GeneralButton
-                color="bg-primary-accent-light dark:bg-primary-accent-dark text-button-text-light dark:text-button-text-dark hover:bg-primary-accent-dark dark:hover:bg-primary-accent-light"
-                border=" rounded-lg px-8"
-                onClick={() => setIsOpenModal(true)}
-              >
-                Finalizar compra
-              </GeneralButton>
-
-              <p
-                className="text-text-muted-light dark:text-text-muted-dark cursor-pointer"
-                onClick={clearUserCart}
-              >
-                Limpar carrinho
-              </p>
-            </div>
-          </footer>
           {isOpenModal && (
             <ConfirmationModal
               isOpen={isOpenModal}

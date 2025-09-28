@@ -36,6 +36,23 @@ export interface ProductFilterParams {
     limit?: number;
 }
 
+export interface ProductListResponse {
+  products: Product[];
+  totalProductsCount: number;
+  productsPerPage: number;
+}
+
+export const ALL_SIZES: string[] = [
+  // Tamanhos numéricos
+  "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45",
+
+  // Tamanhos de roupas padrão
+  "PP", "P", "M", "G", "GG", "XG", "XXG",
+
+  // Tamanhos em formato internacional
+  "XS", "S", "L", "XL", "XXL", "XXXL",
+];
+
 export const getProducts = async (params?: ProductFilterParams): Promise<Product[]> => {
     const response = await api.get("/products", { params });
     return response.data;

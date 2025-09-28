@@ -5,28 +5,50 @@ import Link from "next/link";
 import NavButton from "../ui/NavButton";
 import { HiOutlineUser, HiOutlineShoppingBag } from "react-icons/hi2";
 
+import { getCategories } from "@/services/category";
+
 import { sideProps } from "@/app/layout";
 import Search from "../ui/Search";
+import { useEffect, useState } from "react";
+
+interface NavLink {
+  title: string;
+  path: string;
+}
 
 const Header = ({ sideDrawer }: { sideDrawer: (side: sideProps) => void }) => {
-  const navLinks = [
-    {
-      title: "Home",
-      path: "/",
-    },
-    {
-      title: "Categorias",
-      path: "/categories",
-    },
-    {
-      title: "Sobre",
-      path: "/about",
-    },
-    {
-      title: "Novidades",
-      path: "/news",
-    },
-  ];
+  // const navLinks = [
+  //   {
+  //     title: "Home",
+  //     path: "/",
+  //   },
+  //   {
+  //     title: "Categorias",
+  //     path: "/categories",
+  //   },
+  //   {
+  //     title: "Sobre",
+  //     path: "/about",
+  //   },
+  //   {
+  //     title: "Novidades",
+  //     path: "/news",
+  //   },
+  // ];
+
+  const [navLinks, setNavLinks] = useState<NavLink[]>([]);
+
+  useEffect(() => {
+  const fetchCategories = async () => {
+    const categories = await getCategories();
+    const links = categories.map((category) => ({
+      title: category.name,
+      path: `/products?category=${category._id}`,
+    }));
+    setNavLinks(links);
+  };
+  fetchCategories();
+}, []);
 
   return (
     <header className="px-[clamp(1rem,5vw,5rem)] py-4 gap-4 flex flex-col fixed w-full backdrop-blur-sm z-2">

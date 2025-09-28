@@ -35,11 +35,17 @@ const getProducts = async (req, res) => {
     const {
       displayType,
       categoryId,
+      search,
+      minPrice,
+      maxPrice,
+      size,
+      page,
       limit
     } = req.query;
     let filter = {};
     let sort = {};
     let queryLimit = limit ? parseInt(limit) : 6;
+    let skip = page ? (parseInt(page) - 1) * queryLimit : 0;
 
     if (displayType === 'novidade') {
       filter = { inStock: true };
@@ -56,7 +62,37 @@ const getProducts = async (req, res) => {
       }
       filter.category = categoryId;
     }
+
+    if (search) {
+      filter.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    if (!displayType && categoryId && mongoose.Types.ObjectId.isValid(categoryId)) {
+      filter.category = categoryId;
+    }
+
+    if (minPrice || maxPrice) {
+      filter.price = {};
+      if (minPrice) {
+        filter.price.$gte = parseFloat(minPrice);
+      }
+      if (maxPrice) {
+        filter.price.$lte = parseFloat(maxPrice);
+      }
+    }
+
+    if (size) {
+      const sizesArray = size.split(",").map((s) => s.trim());
+      if (sizesArray.length > 0) {
+        filter.size = { $in: sizesArray };
+      }
+    }
+
       filter.inStock = true
+      
       let productQuery = Product.find(filter);
 
     if (Object.keys(sort).length > 0) {
@@ -65,12 +101,12 @@ const getProducts = async (req, res) => {
     productQuery = productQuery.sort({ createdAt: -1 })
     }
 
-    if (queryLimit > 0) {
-      productQuery = productQuery.limit(queryLimit);
-    }
+    const totalProducts = await Product.countDocuments(filter);
+
+    productQuery = productQuery.skip(skip).limit(queryLimit);
 
     const products = await productQuery.populate("category", "name");
-    res.json(products);
+    res.json({products, totalProducts, productPerPage: queryLimit});
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Erro ao buscar produtos", error: error.message });
