@@ -24,6 +24,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import GroupForm from "@/components/layouts/ui/GroupForm";
 import HookFormInput from "@/components/layouts/ui/HookFormInput";
+import { useRouter } from "next/navigation";
 
 const categorySchema = z.object({
   name: z
@@ -41,6 +42,8 @@ const Page: React.FC = () => {
   const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(
     null
   );
+
+  const router = useRouter();
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
@@ -223,7 +226,7 @@ const Page: React.FC = () => {
               <tbody>
                 {filteredCategories?.map((category) => (
                   <tr key={category._id}>
-                    <td>{category.name}</td>
+                    <td >{category.name}</td>
                     <td>{category.createdAt.substring(0, 10)}</td>
                     <td>
                       <button

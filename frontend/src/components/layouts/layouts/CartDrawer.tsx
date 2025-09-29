@@ -39,6 +39,8 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen }) => {
     0
   );
 
+  console.log(cart?.items);
+
   const LocalCartTotalPrice =
     cart?.items.reduce(
       (total, item) => total + item.product.price * localCartTotalQuantity,

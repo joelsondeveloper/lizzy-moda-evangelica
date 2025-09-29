@@ -26,6 +26,7 @@ import HookFormInput from "@/components/layouts/ui/HookFormInput";
 import ImageUploadField from "@/components/admin/ImageUploadField";
 import Image from "next/image";
 import { ALL_SIZES } from "@/services/product";
+import { useRouter } from "next/navigation";
 
 const productSchema = z.object({
   name: z
@@ -61,6 +62,8 @@ const Page: React.FC = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
 
+  const router = useRouter();
+
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
@@ -81,7 +84,7 @@ const Page: React.FC = () => {
     queryFn: getCategories,
   });
 
-  const filteredProducts = products?.filter((product) => {
+  const filteredProducts = products?.products.filter((product) => {
     const term = searchTerm.toLowerCase();
     return (
       product.name.toLowerCase().includes(term) ||
@@ -284,7 +287,7 @@ const Page: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredProducts?.map((product) => (
+                {filteredProducts?.map((product: Product) => (
                   <tr key={product._id}>
                     <td>
                       <Image
@@ -292,7 +295,7 @@ const Page: React.FC = () => {
                         width={48}
                         height={48}
                         alt={product.name}
-                        className="w-12 h-12 object-cover rounded-2xl border-2 border-primary-accent-light dark:border-primary-accent-dark"
+                        className="w-12 h-12 object-cover rounded-2xl border-2 border-primary-accent-light dark:border-primary-accent-dark cursor-pointer"
                       />
                     </td>
                     <td>{product.name}</td>

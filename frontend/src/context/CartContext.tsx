@@ -96,10 +96,11 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         (total, item) => total + item.quantity,
         0
       );
-      const totalVal = fetchedCart.items.reduce(
-        (total, item) => total + item.product.price * item.quantity,
-        0
-      );
+      const totalVal = fetchedCart.items.reduce((total, item) => {
+        if (!item.product || typeof item.product.price !== "number")
+          return total;
+        return total + item.product.price * item.quantity;
+      }, 0);
       setTotalItems(itemsCount);
       setTotalPrice(totalVal);
     } catch (error: any) {

@@ -10,6 +10,7 @@ import { getCategories } from "@/services/category";
 import { sideProps } from "@/app/layout";
 import Search from "../ui/Search";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface NavLink {
   title: string;
@@ -36,19 +37,30 @@ const Header = ({ sideDrawer }: { sideDrawer: (side: sideProps) => void }) => {
   //   },
   // ];
 
+  const router = useRouter();
   const [navLinks, setNavLinks] = useState<NavLink[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-  const fetchCategories = async () => {
-    const categories = await getCategories();
-    const links = categories.map((category) => ({
-      title: category.name,
-      path: `/products?category=${category._id}`,
-    }));
-    setNavLinks(links);
+    const fetchCategories = async () => {
+      const categories = await getCategories();
+      const links = categories.map((category) => ({
+        title: category.name,
+        path: `/products?category=${category._id}`,
+      }));
+      setNavLinks(links);
+    };
+    fetchCategories();
+  }, []);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      router.push(`/products?search=${encodeURIComponent(searchTerm)}`);
+    } else {
+      router.push("/products");
+    }
   };
-  fetchCategories();
-}, []);
 
   return (
     <header className="px-[clamp(1rem,5vw,5rem)] py-4 gap-4 flex flex-col fixed w-full backdrop-blur-sm z-2">
@@ -68,7 +80,9 @@ const Header = ({ sideDrawer }: { sideDrawer: (side: sideProps) => void }) => {
           </div>
         </div>
 
-        <Search value="" setValue={() => {}} />
+        <form onSubmit={handleSearch}>
+          <Search value={searchTerm} setValue={setSearchTerm} />
+        </form>
         <div className="actions flex gap-5">
           <NavButton size="w-12" handleClick={() => sideDrawer("auth")}>
             <HiOutlineUser />

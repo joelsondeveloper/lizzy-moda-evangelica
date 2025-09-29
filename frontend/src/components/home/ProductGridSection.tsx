@@ -23,7 +23,7 @@ const ProductGridSection = ({
   useEffect(() => {
     const fetchProducts = async () => {
       const products = await getProducts({ displayType, categoryId, limit });
-      setProducts(products);
+      setProducts(products.products);
       setLoading(false);
     };
     fetchProducts();

@@ -17,7 +17,15 @@ const getCart = async (req, res) => {
       cart = await Cart.create({ user: req.user._id, items: [] });
       cart = await populateCartItems(Cart.findOne({ user: req.user._id }));
     }
-    res.json(cart);
+
+    const validItems = cart.items.filter((item) => item.product !== null);
+
+    if (validItems.length !== cart.items.length) {
+      cart.items = validItems;
+      await cart.save();
+    }
+
+    res.json({...cart.toObject(), items: validItems});
   } catch (error) {
     res.status(500).json({ message: "Erro ao buscar carrinho" });
   }
