@@ -7,7 +7,8 @@ const {
   getOrdersForAdmin,
   getOrderById,
   updateOrderStatus,
-  deleteOrder
+  deleteOrder,
+  getOrdersByUserId
 } = require("../controllers/orderController");
 
 const router = express.Router();
@@ -16,6 +17,7 @@ router.post("/", protect, createOrder);
 router.get("/", protect, getUserOrders);
 router.get("/admin", protect, admin, getOrdersForAdmin);
 router.get("/:id", protect, getOrderById);
+router.get("/user/:userId", protect, getOrdersByUserId);
 router.put("/:id", protect, admin, updateOrderStatus);
 router.delete("/:id", protect, admin, deleteOrder);
 

@@ -6,9 +6,31 @@ const User = require("../models/User");
 const populateOrderDetails = (query) => {
   return query.populate("user", "name email").populate({
     path: "items.product",
+    select: "name imageUrl price",
     populate: { path: "category", select: "name" },
   });
 };
+
+const getOrdersByUserId = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: "ID de usuário inválido" });
+        }
+
+        if (!req.user.isAdmin && req.user._id.toString() !== id.toString()) {
+            return res.status(403).json({ message: "Acesso restrito. Apenas administradores podem ver outros usuários" });
+        }
+
+        const orders = await populateOrderDetails(Order.find({ user: id }).sort({ createdAt: -1 }));
+
+        res.json(orders);
+    } catch (error) {
+        console.error("Erro ao buscar pedidos:", error);
+        res.status(500).json({ message: "Erro ao buscar pedidos" });
+    }
+}
 
 const createOrder = async (req, res) => {
   try {
@@ -230,4 +252,5 @@ module.exports = {
   getOrderById,
   updateOrderStatus,
   deleteOrder,
+  getOrdersByUserId
 };
