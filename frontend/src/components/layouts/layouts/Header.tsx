@@ -48,7 +48,7 @@ const Header = ({ sideDrawer }: { sideDrawer: (side: sideProps) => void }) => {
         title: category.name,
         path: `/products?category=${category._id}`,
       }));
-      setNavLinks(links.splice(0, 5));
+      setNavLinks(links);
     };
     fetchCategories();
   }, []);

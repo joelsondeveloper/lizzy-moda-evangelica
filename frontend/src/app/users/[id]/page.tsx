@@ -104,7 +104,6 @@ const Page: React.FC = () => {
   }
 
   if (isUserError || isOrderError) {
-    toast.error(userError?.message || orderError?.message || 'Erro ao carregar dados.');
     return <p className="text-red-500 text-center mt-8">Erro ao carregar dados: {(userError || orderError as Error)?.message}</p>;
   }
   if (!user) {

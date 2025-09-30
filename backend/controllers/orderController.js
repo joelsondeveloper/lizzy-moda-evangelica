@@ -2,6 +2,7 @@ const Order = require("../models/Order");
 const Cart = require("../models/Cart");
 const Product = require("../models/Product");
 const User = require("../models/User");
+const mongoose = require("mongoose");
 
 const populateOrderDetails = (query) => {
   return query.populate("user", "name email").populate({
