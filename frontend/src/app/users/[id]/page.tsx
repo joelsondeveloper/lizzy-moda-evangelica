@@ -33,6 +33,8 @@ const Page: React.FC = () => {
   const router = useRouter()
   const id = params.id as string  
 
+  console.log("id:", id);
+
   const { user: currentUser, isAuthenticated, isAdmin, isLoading: authLoading, refetchUser } = useAuth()
 
   const queryClient = useQueryClient()
