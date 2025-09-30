@@ -34,7 +34,7 @@ const AuthDrawer = ({ setIsConfirming }: Props) => {
     },
     {
       title: "Minha Conta / Perfil",
-      path: "/my-account",
+      path: `/users/${user?._id}`,
       icon: <FiUser />,
     },
     {
