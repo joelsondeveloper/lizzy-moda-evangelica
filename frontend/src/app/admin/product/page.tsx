@@ -245,7 +245,7 @@ const Page: React.FC = () => {
 
   return (
     <>
-      <section className="py-8 flex flex-col">
+      <section className="py-8 flex flex-col max-w-[100vw]">
         <header className="flex flex-col items-center gap-4">
           <div className="title flex flex-col justify-center text-center gap-2">
             <h2 className="font-playfair text-3xl font-bold">
@@ -272,9 +272,12 @@ const Page: React.FC = () => {
           </div>
         </header>
 
-        <div className="content mt-8">
+        <div
+          className="content mt-8 max-w-[85%] sm:max-w-[85%] md:max-w-[70%]
+ overflow-x-auto scrollbar-thin scrollbar-thumb-rounded-lg scrollbar-thumb-blue-500 scrollbar-track-gray-200 mx-auto"
+        >
           <DashboardCard>
-            <table className="table-custom w-full text-center">
+            <table className="table-custom text-center w-full">
               <thead>
                 <tr>
                   <th>Imagem</th>

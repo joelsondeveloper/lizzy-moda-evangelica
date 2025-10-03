@@ -29,6 +29,12 @@ export interface updateOrderStatusData {
     status: "pendente" | "confirmado" | "cancelado";
 }
 
+export const orderStatuses = [
+    { value: 'pendente', label: 'Pendente' },
+    { value: 'confirmado', label: 'Confirmado' },
+    { value: 'cancelado', label: 'Cancelado' },
+  ];
+
 export const getOrdersByUserId = async (id: string): Promise<Order[]> => {
     const response = await api.get(`/orders/user/${id}`);
     return response.data;

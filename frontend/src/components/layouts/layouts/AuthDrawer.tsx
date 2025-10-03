@@ -28,28 +28,13 @@ const AuthDrawer = ({ setIsConfirming }: Props) => {
 
   const navLinksUser = [
     {
-      title: "Meus Pedidos",
-      path: "/my-orders",
-      icon: <FiShoppingBag />,
-    },
-    {
       title: "Minha Conta / Perfil",
       path: `/users/${user?._id}`,
       icon: <FiUser />,
     },
     {
-      title: "Configuracoes",
-      path: "/settings",
-      icon: <FiSettings />,
-    },
-    {
-      title: "Nossa Loja Fisica",
-      path: "/addresses",
-      icon: <FiMapPin />,
-    },
-    {
-      title: "Contato",
-      path: "/support",
+      title: "Contato / Loja fisica",
+      path: "/contact",
       icon: <FiMail />,
     },
   ];

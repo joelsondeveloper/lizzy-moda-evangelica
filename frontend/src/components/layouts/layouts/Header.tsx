@@ -11,6 +11,7 @@ import { sideProps } from "@/app/layout";
 import Search from "../ui/Search";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useCart } from "@/context/CartContext";
 
 interface NavLink {
   title: string;
@@ -40,6 +41,8 @@ const Header = ({ sideDrawer }: { sideDrawer: (side: sideProps) => void }) => {
   const router = useRouter();
   const [navLinks, setNavLinks] = useState<NavLink[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+
+  const { totalItems } = useCart()
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -92,14 +95,14 @@ const Header = ({ sideDrawer }: { sideDrawer: (side: sideProps) => void }) => {
               className="cart-count absolute top-0 right-0 w-4 aspect-square text-xs text-white bg-primary-accent-light
             dark:bg-primary-accent-dark rounded-full flex items-center justify-center"
             >
-              0
+              {totalItems}
             </span>
             <HiOutlineShoppingBag />
           </NavButton>
         </div>
       </div>
-      <nav>
-        <ul className="flex gap-12 justify-center">
+      <nav className="overflow-hidden">
+        <ul className="flex gap-12 justify-center mx-auto w-max ">
           {navLinks.map((link, index) => (
             <li
               className="font-medium text-primary-accent-light dark:text-primary-accent-dark"

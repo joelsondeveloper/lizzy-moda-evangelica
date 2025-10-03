@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import NavButton from "@/components/layouts/ui/NavButton";
 
 import { FiMenu } from "react-icons/fi";
+import { AiOutlineArrowLeft } from "react-icons/ai"
 import {
   HiOutlineViewColumns,
   HiOutlineTag,
@@ -84,6 +85,11 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
 
   return (
     <div className="flex min-h-screen text-primary-accent-light dark:text-primary-accent-dark  bg-card-background-light dark:bg-card-background-dark">
+      <div className="menu absolute top-4 left-4 md:left-[92%]">
+        <NavButton size="w-12 h-12" handleClick={() => router.back()}>
+          <AiOutlineArrowLeft size="50%" />
+        </NavButton>
+      </div>
       <div className="menu absolute top-4 right-4 md:hidden">
         <NavButton size="w-12 h-12" handleClick={() => setIsOpen(true)}>
           <FiMenu size="50%" />
