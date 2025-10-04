@@ -25,17 +25,21 @@ interface ProductFormImagesData {
 interface ImageUploadFieldProps {
   label: string;
   id: string;
-  name: keyof ProductFormImagesData;
+  name: keyof ImagesFields & string;
   error?: string | FieldError;
   setValue: UseFormSetValue<ProductFormImagesData>;
   getValues: UseFormGetValues<ProductFormImagesData>;
   rhfRegister: UseFormRegisterReturn;
 }
 
+interface ImagesFields {
+  imageFiles?: File[] | null;
+  currentImageUrls?: string[] | null;
+}
+
 const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
   label,
   id,
-  name,
   error,
   setValue,
   getValues,
@@ -48,8 +52,13 @@ const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
 
   const errorMessage = typeof error === "string" ? error : error?.message;
 
-  const currentImageUrlsFromRHF = getValues("currentImageUrls") || [];
-  const imageFilesFromRHF = getValues("imageFiles") || [];
+  const currentImageUrlsFromRHF = useMemo(() => {
+    return (getValues("currentImageUrls") as string[] | null) || [];
+  }, [getValues]);
+
+  const imageFilesFromRHF = useMemo(() => {
+    return (getValues("imageFiles") as File[] | null) || [];
+  }, [getValues]);
 
   // useEffect(() => {
   //   console.log(
@@ -83,13 +92,13 @@ const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
         setPreviews([]);
       }
     }
-  }, [imageFilesFromRHF]);
+  }, [imageFilesFromRHF, previews]);
 
   const handleFileChange = useCallback(
     (files: FileList | null) => {
       if (files) {
         const newFilesArray = Array.from(files);
-        const existingFiles = getValues("imageFiles") || [];
+        const existingFiles = imageFilesFromRHF
 
         const totalExistingImages =
           currentImageUrlsFromRHF.length + existingFiles.length;
@@ -117,7 +126,13 @@ const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
         }
       }
     },
-    [getValues, setValue, currentImageUrlsFromRHF.length]
+    [
+      imageFilesFromRHF,
+      currentImageUrlsFromRHF,
+      setValue,
+      getValues,
+      fileInputRef,
+    ]
   );
 
   const handleRemoveImage = useCallback(

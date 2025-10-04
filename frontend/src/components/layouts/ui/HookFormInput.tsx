@@ -3,7 +3,7 @@ import { FieldError } from "react-hook-form";
 
 type HookFormInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   spanText: string;
-  error?: FieldError | undefined; // pra exibir mensagens do RHF
+  error?: FieldError | string | undefined; // pra exibir mensagens do RHF
 };
 
 const HookFormInput = ({ spanText, error, ...props }: HookFormInputProps) => {
@@ -17,7 +17,7 @@ const HookFormInput = ({ spanText, error, ...props }: HookFormInputProps) => {
         ${error ? "border-red-500" : ""}`}
         {...props}
       />
-      {error && <p className="text-red-500 text-sm">{error.message}</p>}
+      {error && <p className="text-red-500 text-sm">{typeof error === "string" ? error : error?.message}</p>}
     </label>
   );
 };

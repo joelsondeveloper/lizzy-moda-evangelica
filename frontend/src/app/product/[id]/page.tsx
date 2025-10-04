@@ -24,15 +24,13 @@ const Page = () => {
     enabled: !!productId,
   });
 
-  const { addItem, isLoading: isLoadingCart } = useCart();
+  const { addItem } = useCart();
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [mainImageIndex, setMainImageIndex] = useState(0);
 
   const [isZoomActive, setIsZoomActive] = useState(false);
   const [bgPosition, setBgPosition] = useState("0% 0%");
   const imageContainerRef = useRef<HTMLDivElement>(null);
-
-  const [sizeSelected, setSizeSelected] = useState(false);
 
   useEffect(() => {
     if (product) {

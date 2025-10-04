@@ -10,15 +10,7 @@ import { useAuth } from "@/context/AuthContext";
 import { HiArrowLeft, HiEye } from "react-icons/hi2";
 import GeneralButton from "@/components/layouts/ui/GeneralButton";
 import ConfirmationModal from "@/components/layouts/ui/ConfirmationModal";
-import { FaTrash, FaEdit, FaEye } from "react-icons/fa";
-import SideDrawer from "@/components/layouts/layouts/SideDrawer";
 import Link from "next/link";
-
-const orderStatuses = [
-  { value: "pendente", label: "Pendente" },
-  { value: "confirmado", label: "Confirmado" },
-  { value: "cancelado", label: "Cancelado" },
-];
 
 type ApiError = {
   response?: {
@@ -38,13 +30,12 @@ const Page: React.FC = () => {
     isAuthenticated,
     isAdmin,
     isLoading: authLoading,
-    refetchUser,
   } = useAuth();
 
   const queryClient = useQueryClient();
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  // const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
   const {
     data: user,
@@ -146,9 +137,9 @@ const Page: React.FC = () => {
     },
   });
 
-  const handleDeleteUserClick = () => {
-    setIsDeleteModalOpen(true);
-  };
+  // const handleDeleteUserClick = () => {
+  //   setIsDeleteModalOpen(true);
+  // };
 
   const handleConfirmDelete = () => {
     if (user) {

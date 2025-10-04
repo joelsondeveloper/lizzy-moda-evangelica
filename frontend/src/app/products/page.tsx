@@ -13,7 +13,6 @@ import { getCategories, Category } from "@/services/category";
 import ProductCard from "@/components/product/ProductCard";
 import { toast } from "react-toastify";
 import { HiOutlineAdjustments, HiOutlineRefresh } from "react-icons/hi";
-import GeneralButton from "@/components/layouts/ui/GeneralButton";
 import { ALL_SIZES } from "@/services/product";
 
 const Page: React.FC = () => {
@@ -147,9 +146,9 @@ const handlePriceChange = (type: "min" | "max", value: string) => {
     router.push("/products");
   };
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
+  // const handlePageChange = (page: number) => {
+  //   setCurrentPage(page);
+  // };
 
   if (isLoading || categoriesLoading) {
     return (
@@ -239,11 +238,11 @@ const handlePriceChange = (type: "min" | "max", value: string) => {
 
   const products = productListResponse?.products || [];
   const totalProductsCount = productListResponse?.totalProducts || 0;
-  const productsPerPageFromResponse =
-    productListResponse?.productPerPage || 12;
-  const totalPages = Math.ceil(
-    totalProductsCount / productsPerPage
-  );
+  // const productsPerPageFromResponse =
+  //   productListResponse?.productPerPage || 12;
+  // const totalPages = Math.ceil(
+  //   totalProductsCount / productsPerPage
+  // );
 
   console.log(productListResponse);
 

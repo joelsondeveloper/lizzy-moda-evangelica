@@ -5,7 +5,6 @@ import React, {
   useEffect,
   ReactNode,
   useCallback,
-  useRef,
 } from "react";
 import { toast } from "react-toastify";
 import { useAuth } from "./AuthContext";
@@ -13,11 +12,12 @@ import {
   getCart,
   addToCart,
   updateCartItem,
-  removeItem,
   clearCart,
   Cart,
-  CartItem as ApiCartItem,
 } from "@/services/carts";
+
+import { isAxiosError } from "@/utils/typeguards";
+import { BackendErrorResponse } from "@/types/api";
 
 export interface ProductInCart {
   _id: string;
@@ -103,9 +103,13 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       }, 0);
       setTotalItems(itemsCount);
       setTotalPrice(totalVal);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Erro ao buscar carrinho:", error);
-      if (error.response?.status === 404) {
+      let errorMessage = 400;
+      if (isAxiosError(error)) {
+        errorMessage = error.response?.status || 400;
+      }
+      if (errorMessage === 404) {
         setCart({
           _id: "",
           user: user?._id || "",
@@ -118,7 +122,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         setErrorCart(null);
       } else {
         setErrorCart(
-          error.response?.data?.message || "Erro ao buscar carrinho"
+          "Erro ao buscar carrinho"
         );
         setCart(null);
         setTotalItems(0);
@@ -159,10 +163,13 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       setTotalItems(itemsCount);
       setTotalPrice(totalVal);
       toast.success("Produto adicionado ao carrinho com sucesso!");
-    } catch (error: any) {
+    } catch (error: unknown) {
+      let errorMessage;
+      if (isAxiosError(error)) {
+        errorMessage = error.response?.data as BackendErrorResponse;
+      }
       toast.error(
-        error.response?.data?.message ||
-          "Erro ao adicionar produto ao carrinho."
+        errorMessage?.message || "Erro ao adicionar produto ao carrinho."
       );
     } finally {
       setIsLoadingCart(false);
@@ -175,7 +182,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     size: string
   ) => {
     console.log("[modifyLocalCart] params:", { productId, quantity, size });
-    setLocalCart((prevCart: any) => {
+    setLocalCart((prevCart: CartItem[]) => {
       const existing = prevCart.find(
         (item) => item._id === productId && item.size === size
       );
@@ -216,9 +223,13 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       setTotalItems(itemsCount);
       setTotalPrice(totalVal);
       toast.success("Produto atualizado no carrinho com sucesso!");
-    } catch (error: any) {
+    } catch (error: unknown ) {
+      let errorMessage;
+      if (isAxiosError(error)) {
+        errorMessage = error.response?.data as BackendErrorResponse;
+      }
       toast.error(
-        error.response?.data?.message ||
+        errorMessage?.message ||
           "Erro ao atualizar produto no carrinho."
       );
     } finally {
@@ -228,9 +239,9 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
   const updateItemQuantityLocal = () => {
     if (localCart.length === 0) return;
-    localCart.forEach((item: any) => {
+    localCart.forEach((item: CartItem) => {
       const product = cart?.items.find(
-        (p: any) => p.product._id === item._id && p.size === item.size
+        (p: CartItem) => p.product._id === item._id && p.size === item.size
       );
       if (item.quantity === 0) return;
       console.log(item._id, cart?.items);
@@ -262,9 +273,13 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       setTotalItems(itemsCount);
       setTotalPrice(totalVal);
       toast.info("Produto removido do carrinho com sucesso!");
-    } catch (error: any) {
+    } catch (error: unknown) {
+      let errorMessage
+      if (isAxiosError(error)) {
+        errorMessage = error.response?.data as BackendErrorResponse;
+      }
       toast.error(
-        error.response?.data?.message || "Erro ao remover produto do carrinho."
+        errorMessage?.message || "Erro ao remover produto do carrinho."
       );
     } finally {
       setIsLoadingCart(false);

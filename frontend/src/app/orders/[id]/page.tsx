@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { getOrderById, Order, orderStatuses } from "@/services/order";
+import { useQuery } from "@tanstack/react-query";
+import { getOrderById, Order } from "@/services/order";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
 import Link from "next/link";
 import Image from "next/image";
 import GeneralButton from "@/components/layouts/ui/GeneralButton";
-import { HiArrowLeft, HiOutlinePrinter } from "react-icons/hi";
+import { HiArrowLeft } from "react-icons/hi";
 
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
@@ -23,7 +23,6 @@ const Page: React.FC = () => {
   const {
     user: currentUser,
     isAuthenticated,
-    isAdmin,
     isLoading: authLoading,
   } = useAuth();
 

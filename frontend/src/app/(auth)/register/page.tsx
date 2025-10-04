@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
@@ -13,6 +12,9 @@ import * as z from "zod";
 import HookFormInput from "@/components/layouts/ui/HookFormInput";
 import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
+
+import { isAxiosError } from "@/utils/typeguards";
+import { BackendErrorResponse } from "@/types/api";
 
 const RegisterSchema = z
   .object({
@@ -27,19 +29,10 @@ const RegisterSchema = z
   });
 
 type RegisterFormSchema = z.infer<typeof RegisterSchema>;
-type ApiError = {
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
-};
 
 const Page = () => {
   const {
     register: authRegister,
-    isAuthenticated,
-    isAdmin,
     isLoading: authLoading,
   } = useAuth();
 
@@ -83,9 +76,14 @@ const Page = () => {
         "Usuário cadastrado com sucesso! Verifique seu email para ativar sua conta."
       );
       router.push(`/verify?email=${encodeURIComponent(data.email)}`);
-    } catch (err: any) {
-      const errorMessage =
-        err.response?.data?.message || "Erro ao cadastrar usuário.";
+    } catch (err: unknown) {
+      let errorMessage =
+        "Erro ao cadastrar usuário.";
+
+      if (isAxiosError(err)) {
+        const errorData = err.response?.data as BackendErrorResponse;
+        errorMessage = errorData.message || errorMessage;
+      }
       setFormError("root", { message: errorMessage });
       toast.error(errorMessage);
 

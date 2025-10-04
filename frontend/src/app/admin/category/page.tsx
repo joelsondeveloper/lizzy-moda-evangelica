@@ -16,15 +16,12 @@ import {
   getCategories,
   updateCategory,
 } from "@/services/category";
-import SideDrawer from "@/components/layouts/layouts/SideDrawer";
 import SideForm from "@/components/layouts/layouts/SideForm";
 import Form from "@/components/layouts/layouts/Form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import GroupForm from "@/components/layouts/ui/GroupForm";
 import HookFormInput from "@/components/layouts/ui/HookFormInput";
-import { useRouter } from "next/navigation";
 
 const categorySchema = z.object({
   name: z
@@ -42,8 +39,6 @@ const Page: React.FC = () => {
   const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(
     null
   );
-
-  const router = useRouter();
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
@@ -69,7 +64,7 @@ const Page: React.FC = () => {
 
   useEffect(() => {
     resetForm(editingCategory);
-  }, [editingCategory, reset]);
+  }, [editingCategory, resetForm]);
 
   const { data, isLoading, isError, error } = useQuery<Category[], Error>({
     queryKey: ["adminCategories"],

@@ -11,7 +11,7 @@ const ProductCard = ({ product }: { product: Product }) => {
 
   const Router = useRouter();
 
-  const { addItem, isLoading: isLoadingCart } = useCart();
+  const { addItem } = useCart();
 
   const [isHovered, setIsHovered] = useState(false);
 

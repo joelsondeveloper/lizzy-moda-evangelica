@@ -8,9 +8,9 @@ interface InvoiceTemplateProps {
 
 const InvoiceTemplate: React.FC<InvoiceTemplateProps> = ({order}) => {
 
-    const getStatusLabel = (statusValue: string) => {
-        return orderStatuses.find((status) => status.value === statusValue)?.label;
-      };
+    // const getStatusLabel = (statusValue: string) => {
+    //     return orderStatuses.find((status) => status.value === statusValue)?.label;
+    //   };
 
   return (
     <article className="w-[4.135in] bg-white p-5">

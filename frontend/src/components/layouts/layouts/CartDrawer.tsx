@@ -7,12 +7,10 @@ import { toast } from "react-toastify";
 import { HiOutlineShoppingCart } from "react-icons/hi";
 import GeneralButton from "../ui/GeneralButton";
 import ProductItemCart from "@/components/product/ProductItemCart";
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useState } from "react";
 import ConfirmationModal from "../ui/ConfirmationModal";
 
 import { createOrder } from "@/services/order";
-import { set } from "react-hook-form";
 
 interface CartDrawerProps {
   isOpen: boolean;

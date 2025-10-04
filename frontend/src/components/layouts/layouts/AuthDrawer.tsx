@@ -3,10 +3,7 @@
 import { useAuth } from "@/context/AuthContext";
 
 import {
-  FiShoppingBag,
   FiUser,
-  FiSettings,
-  FiMapPin,
   FiMail,
   FiLogOut,
 } from "react-icons/fi";

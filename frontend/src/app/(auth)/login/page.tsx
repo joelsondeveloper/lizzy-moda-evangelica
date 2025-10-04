@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
+import { isAxiosError } from "@/utils/typeguards";
+import { BackendErrorResponse } from '@/types/api';
 
 import Form from "@/components/layouts/layouts/Form";
 // import GroupForm from "@/components/layouts/ui/GroupForm";
@@ -14,7 +15,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import HookFormInput from "@/components/layouts/ui/HookFormInput";
-import { en } from "zod/locales";
 import { FcGoogle } from "react-icons/fc";
 
 const LoginSchema = z.object({
@@ -23,18 +23,10 @@ const LoginSchema = z.object({
 });
 
 type LoginFormSchema = z.infer<typeof LoginSchema>;
-type ApiError = {
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
-};
 
 const Page = () => {
-  const [error, setError] = useState<string | null>(null);
 
-  const { login, isUserVerified, isLoading: authLoading } = useAuth();
+  const { login, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
   const {
@@ -42,7 +34,6 @@ const Page = () => {
     handleSubmit,
     formState: { errors, isSubmitting },
     setError: setFormError,
-    getValues,
   } = useForm<LoginFormSchema>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
@@ -62,16 +53,19 @@ const Page = () => {
   // }, [isAuthenticated, router, isAdmin, authLoading]);
 
   const onSubmit = async (data: LoginFormSchema) => {
-    setError(null);
     setFormError("root", { message: "" });
     try {
       await login({ email: data.email, password: data.password });
       toast.success("Login realizado com sucesso!, seja bem vindo!");
       router.push("/");
-    } catch (err: any) {
-      const errorMessage =
-        err.response?.data?.message || "Email ou senha incorretos.";
-      setError(errorMessage);
+    } catch (err: unknown) {
+      let errorMessage =
+        "Email ou senha incorretos.";
+
+      if (isAxiosError(err)) {
+        const errorData = err.response?.data as BackendErrorResponse;
+        errorMessage = errorData.message || errorMessage;
+      }
       setFormError("root", { message: errorMessage });
       toast.error(errorMessage);
 

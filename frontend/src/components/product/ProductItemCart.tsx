@@ -1,26 +1,24 @@
-import { Product } from "@/services/product"
+
 import Image from "next/image"
 import {HiOutlineMinusCircle, HiOutlinePlusCircle, HiOutlineTrash} from "react-icons/hi"
 import { useCart } from "@/context/CartContext"
 import { CartItem as CartItemType } from "@/context/CartContext"
-import { ProductInCart } from "@/services/carts"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 interface ProductItemCartProps {
   item: CartItemType
-  isOpen: boolean
 }
 
-const ProductItemCart: React.FC<ProductItemCartProps> = ({item, isOpen}) => {
+const ProductItemCart: React.FC<ProductItemCartProps> = ({item}) => {
 
   const Router = useRouter();
 
-  const { localCart, updateItemQuantity, modifyLocalCart } = useCart();
+  const { updateItemQuantity, modifyLocalCart } = useCart();
 
   const [localQuantity, setLocalQuantity] = useState(item.quantity);
 
-  const [localSize, setLocalSize] = useState(item.size);
+  const [localSize] = useState(item.size);
 
   useEffect(() => {
     setLocalQuantity(item.quantity);

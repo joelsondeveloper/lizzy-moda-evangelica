@@ -1,9 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
 import { useAuth } from "@/context/AuthContext";
+
+import { isAxiosError } from "@/utils/typeguards";
+import { BackendErrorResponse } from "@/types/api";
 
 import Form from "@/components/layouts/layouts/Form";
 import HookFormInput from "@/components/layouts/ui/HookFormInput";
@@ -13,8 +16,7 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useForm } from "react-hook-form";
-import { verifyUser, VerifyData } from "@/services/auth";
-import { is } from "zod/locales";
+import { verifyUser } from "@/services/auth";
 
 const verificationSchema = z.object({
   email: z.string().email("Email inválido"),
@@ -25,13 +27,6 @@ const verificationSchema = z.object({
 });
 
 type VerificationFormSchema = z.infer<typeof verificationSchema>;
-type ApiError = {
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
-};
 
 const Page: React.FC = () => {
   const router = useRouter();
@@ -75,9 +70,13 @@ const Page: React.FC = () => {
       toast.success(response.message || "Usuário verificado com sucesso!");
       refetchUser();
       router.push("/login");
-    } catch (err: any) {
-      const errorMessage =
-        err.response?.data?.message || "Erro ao verificar usuário.";
+    } catch (err: unknown) {
+      let errorMessage = "Erro ao verificar usuário.";
+
+      if (isAxiosError(err)) {
+        const errorData = err.response?.data as BackendErrorResponse;
+        errorMessage = errorData.message || errorMessage;
+      }
       setError("root", { message: errorMessage });
       toast.error(errorMessage);
       console.error("Erro ao verificar usuário:", err);

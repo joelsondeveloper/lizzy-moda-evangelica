@@ -3,7 +3,7 @@
 import GeneralButton from "@/components/layouts/ui/GeneralButton";
 import DashboardCard from "@/components/admin/DashboardCard";
 import Search from "@/components/layouts/ui/Search";
-import { FaPlus, FaEdit, FaTrash, FaShoppingBag } from "react-icons/fa";
+import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -26,7 +26,6 @@ import HookFormInput from "@/components/layouts/ui/HookFormInput";
 import ImageUploadField from "@/components/admin/ImageUploadField";
 import Image from "next/image";
 import { ALL_SIZES } from "@/services/product";
-import { useRouter } from "next/navigation";
 
 const productSchema = z.object({
   name: z
@@ -61,8 +60,6 @@ const Page: React.FC = () => {
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
-
-  const router = useRouter();
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -102,7 +99,6 @@ const Page: React.FC = () => {
     setValue,
     getValues,
     formState: { errors, isSubmitting },
-    watch,
   } = useForm<ProductFormSchema>({
     resolver: zodResolver(productSchema),
     defaultValues: {
