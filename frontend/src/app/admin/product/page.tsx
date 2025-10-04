@@ -19,7 +19,7 @@ import {
 import { getCategories, Category } from "@/services/category";
 import SideForm from "@/components/layouts/layouts/SideForm";
 import Form from "@/components/layouts/layouts/Form";
-import { useForm, UseFormSetValue, UseFormGetValues } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import HookFormInput from "@/components/layouts/ui/HookFormInput";
@@ -58,9 +58,6 @@ type ApiError = { response?: { data?: { message?: string } } };
 
 type ProductsResponse = { products: Product[] };
 
-type ProductFormImagesData = Pick<ProductFormSchema, "imageFiles" | "currentImageUrls">;
-
-
 const Page: React.FC = () => {
   const queryClient = useQueryClient();
 
@@ -74,7 +71,7 @@ const Page: React.FC = () => {
 
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { data: products, isLoading, isError, error } = useQuery<ProductsResponse, Error>({
+  const { data: products, isLoading, isError, error } = useQuery< ProductsResponse, Error>({
   queryKey: ["adminProducts"],
   queryFn: () => getProducts(),
 });
@@ -415,15 +412,15 @@ console.log("products", products);
             <input type="checkbox" {...register("inStock")} />
             <span>Disponível em estoque</span>
           </div>
-          <ImageUploadField<ProductFormData>
-  label="Imagem do produto"
-  id="imageFile"
-  name="imageFiles"
-  rhfRegister={register("imageFiles")}
-  error={errors.imageFiles?.message}
-  setValue={setValue}
-  getValues={getValues}
-/>
+          <ImageUploadField
+            label="Imagem do produto"
+            id="imageFile"
+            name="imageFiles"
+            rhfRegister={register("imageFiles")}
+            error={errors.imageFiles?.message}
+            setValue={setValue} // 🔑 obrigatórios
+            getValues={getValues} // 🔑 obrigatórios
+          />
         </Form>
       </SideForm>
     </>

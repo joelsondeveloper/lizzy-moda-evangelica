@@ -22,32 +22,29 @@ interface ProductFormImagesData {
   currentImageUrls?: string[] | null;
 }
 
-import { FieldValues, Path } from "react-hook-form";
-
-interface ImageUploadFieldProps<T extends FieldValues> {
+interface ImageUploadFieldProps {
   label: string;
   id: string;
-  name: Path<T>; // agora aceita qualquer chave válida do form
+  name: keyof ImagesFields & string;
   error?: string | FieldError;
-  setValue: UseFormSetValue<T>;
-  getValues: UseFormGetValues<T>;
+  setValue: UseFormSetValue<ProductFormImagesData>;
+  getValues: UseFormGetValues<ProductFormImagesData>;
   rhfRegister: UseFormRegisterReturn;
 }
-
 
 interface ImagesFields {
   imageFiles?: File[] | null;
   currentImageUrls?: string[] | null;
 }
 
-const ImageUploadField = <T extends FieldValues>({
+const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
   label,
   id,
   error,
   setValue,
   getValues,
   rhfRegister,
-}: ImageUploadFieldProps<T>) => {
+}) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previews, setPreviews] = useState<string[]>([]);
 
@@ -95,7 +92,7 @@ const ImageUploadField = <T extends FieldValues>({
         setPreviews([]);
       }
     }
-  }, [imageFilesFromRHF, previews]);
+  }, [imageFilesFromRHF]);
 
   const handleFileChange = useCallback(
     (files: FileList | null) => {
