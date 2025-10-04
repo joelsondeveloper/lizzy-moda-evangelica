@@ -148,7 +148,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen }) => {
             {cart?.items?.map((item) => (
               <ProductItemCart
                 item={item}
-                isOpen={isOpen}
                 key={item.product._id}
               />
             ))}

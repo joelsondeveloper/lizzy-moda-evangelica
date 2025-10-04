@@ -90,7 +90,9 @@ const Page: React.FC = () => {
     { label: "Status", value: order?.status },
     {
       label: "Data do pedido",
-      value: new Date(order?.createdAt).toLocaleString().split(",")[0],
+      value: order?.createdAt
+    ? new Date(order.createdAt).toLocaleString().split(",")[0]
+    : "Data não disponível",
     },
   ];
 

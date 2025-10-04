@@ -45,7 +45,7 @@ const ProductItemCart: React.FC<ProductItemCartProps> = ({item}) => {
 
   const handleRemoveItem = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    await updateItemQuantity(item.product._id, 0);
+    await updateItemQuantity(item.product._id, 0, localSize);
   };
 
   return (

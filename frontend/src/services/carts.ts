@@ -5,6 +5,7 @@ export interface ProductInCart {
     name: string;
     imageUrl: string[];
     price: number;
+    size: string[];
 }
 
 export interface CartItem {

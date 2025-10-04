@@ -104,7 +104,7 @@ const Page: React.FC = () => {
       };
       return getProducts(apiParams);
     },
-    keepPreviousData: true,
+     placeholderData: (oldData) => oldData,
   });
 
   const {
