@@ -12,39 +12,42 @@ import {
   UseFormSetValue,
   UseFormGetValues,
   FieldError,
+  FieldValues,
+  Path,
 } from "react-hook-form";
 import Image from "next/image";
 import { HiOutlineUpload, HiOutlineTrash } from "react-icons/hi";
 import { toast } from "react-toastify";
-
-interface ProductFormImagesData {
-  imageFiles?: File[] | null;
-  currentImageUrls?: string[] | null;
-}
-
-interface ImageUploadFieldProps {
-  label: string;
-  id: string;
-  name: keyof ImagesFields & string;
-  error?: string | FieldError;
-  setValue: UseFormSetValue<ProductFormImagesData>;
-  getValues: UseFormGetValues<ProductFormImagesData>;
-  rhfRegister: UseFormRegisterReturn;
-}
 
 interface ImagesFields {
   imageFiles?: File[] | null;
   currentImageUrls?: string[] | null;
 }
 
-const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
+interface ImageUploadFieldProps<TFieldValues extends FieldValues> {
+  label: string;
+  id: string;
+  name: Path<TFieldValues>;
+  error?: string | FieldError;
+  setValue: UseFormSetValue<TFieldValues>;
+  getValues: UseFormGetValues<TFieldValues>;
+  rhfRegister: UseFormRegisterReturn;
+}
+
+interface ImageFields {
+  imageFiles?: File[] | null;
+  currentImageUrls?: string[] | null;
+}
+
+const ImageUploadField = <TFieldValues extends FieldValues>({
   label,
   id,
+  name,
   error,
   setValue,
   getValues,
   rhfRegister,
-}) => {
+}: ImageUploadFieldProps<TFieldValues>) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previews, setPreviews] = useState<string[]>([]);
 
@@ -53,11 +56,11 @@ const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
   const errorMessage = typeof error === "string" ? error : error?.message;
 
   const currentImageUrlsFromRHF = useMemo(() => {
-    return (getValues("currentImageUrls") as string[] | null) || [];
+    return (getValues("currentImageUrls" as Path<TFieldValues>) as string[] | null) || [];
   }, [getValues]);
 
   const imageFilesFromRHF = useMemo(() => {
-    return (getValues("imageFiles") as File[] | null) || [];
+    return (getValues("imageFiles" as Path<TFieldValues>) as File[] | null) || [];
   }, [getValues]);
 
   // useEffect(() => {
@@ -115,14 +118,14 @@ const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
         }
 
         const updatedImageFiles = [...existingFiles, ...newFilesArray];
-        setValue("imageFiles", updatedImageFiles, { shouldValidate: true });
+        setValue(name, updatedImageFiles as TFieldValues[keyof TFieldValues], { shouldValidate: true });
 
         if (fileInputRef.current) {
           fileInputRef.current.value = "";
         }
       } else {
-        if ((getValues("imageFiles") || []).length > 0) {
-          setValue("imageFiles", [], { shouldValidate: true });
+        if ((getValues("imageFiles" as Path<TFieldValues>) || []).length > 0) {
+          setValue("imageFiles" as Path<TFieldValues>, [] as TFieldValues[keyof TFieldValues], { shouldValidate: true });
         }
       }
     },
@@ -132,24 +135,25 @@ const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
       setValue,
       getValues,
       fileInputRef,
+      name
     ]
   );
 
   const handleRemoveImage = useCallback(
     (indexToRemove: number, isNewFile: boolean) => {
       if (isNewFile) {
-        const updatedFiles = (getValues("imageFiles") || []).filter(
+        const updatedFiles = (getValues("imageFiles" as Path<TFieldValues>) || []).filter(
           (_, index) => index !== indexToRemove
         );
-        setValue("imageFiles", updatedFiles, { shouldValidate: true });
+        setValue("imageFiles" as Path<TFieldValues>, updatedFiles as TFieldValues[keyof TFieldValues], { shouldValidate: true });
         if (fileInputRef.current) {
           fileInputRef.current.value = "";
         }
       } else {
-        const updatedUrls = (getValues("currentImageUrls") || []).filter(
+        const updatedUrls = (getValues("currentImageUrls" as Path<TFieldValues>) || []).filter(
           (_, index) => index !== indexToRemove
         );
-        setValue("currentImageUrls", updatedUrls, { shouldValidate: true });
+        setValue("currentImageUrls" as Path<TFieldValues>, updatedUrls as TFieldValues[keyof TFieldValues], { shouldValidate: true });
       }
       toast.info("Imagem excluida com sucesso!");
     },

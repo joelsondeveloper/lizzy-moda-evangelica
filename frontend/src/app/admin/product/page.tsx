@@ -23,6 +23,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import HookFormInput from "@/components/layouts/ui/HookFormInput";
+import { UseFormSetValue, UseFormGetValues } from "react-hook-form";
 import ImageUploadField from "@/components/admin/ImageUploadField";
 import Image from "next/image";
 import { ALL_SIZES } from "@/services/product";
@@ -54,6 +55,16 @@ const productSchema = z.object({
 });
 
 type ProductFormSchema = z.infer<typeof productSchema>;
+
+type ProductImagesData = Pick<ProductFormSchema, "imageFiles" | "currentImageUrls">;
+
+interface ProductImagesProps {
+  rhfRegister: ReturnType<typeof useForm>["register"];
+  error?: string;
+  setValue: UseFormSetValue<ProductFormSchema>;   // 👈 agora espera o form inteiro
+  getValues: UseFormGetValues<ProductFormSchema>;
+}
+
 type ApiError = { response?: { data?: { message?: string } } };
 
 type ProductsResponse = { products: Product[] };
