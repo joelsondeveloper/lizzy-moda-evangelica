@@ -31,8 +31,13 @@ export interface ProductFormData {
 }
 
 export interface ProductFilterParams {
+    search?: string;
     displayType?: 'novidade' | 'destaque' | 'promocao' | 'categoria';
     categoryId?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    size?: string;
+    page?: number;
     limit?: number;
 }
 

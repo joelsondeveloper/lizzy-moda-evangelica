@@ -1,6 +1,5 @@
 "use client";
 
-// import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "../context/AuthContext";
@@ -29,11 +28,6 @@ const PlayfairFont = Playfair_Display({
   display: "swap",
 });
 
-// export const metadata: Metadata = {
-//   title: "Lizzy Moda Evangélica",
-//   description: "Sua loja de moda evangélica online",
-// };
-
 export type sideProps = "auth" | "cart" | "none";
 
 export default function RootLayout({
@@ -51,7 +45,7 @@ export default function RootLayout({
   }, [pathName]);
 
   return (
-    <html lang="pt-BR" className="">
+    <html lang="pt-BR">
       <body
         className={`${InterFont.variable} ${PlayfairFont.variable} font-inter antialiased overflow-x-hidden text-primary-accent-light dark:text-primary-accent-dark  bg-card-background-light dark:bg-card-background-dark`}
       >
@@ -66,8 +60,12 @@ export default function RootLayout({
                     isOpen={wichSideDrawer !== "none"}
                     setIsOpen={setWichSideDrawer}
                   >
-                    {wichSideDrawer === "auth" && <AuthDrawer />}
-                    {wichSideDrawer === "cart" && <CartDrawer />}
+                    {wichSideDrawer === "auth" && (
+                      <AuthDrawer setIsConfirming={() => {}} />
+                    )}
+                    {wichSideDrawer === "cart" && (
+                      <CartDrawer isOpen={wichSideDrawer === "cart"} />
+                    )}
                   </SideDrawer>
                 </main>
               </CartProvider>
