@@ -2,7 +2,7 @@
 import Image from "next/image"
 import {HiOutlineMinusCircle, HiOutlinePlusCircle, HiOutlineTrash} from "react-icons/hi"
 import { useCart } from "@/context/CartContext"
-import { CartItem as CartItemType } from "@/context/CartContext"
+import { CartItem as CartItemType } from "@/types/cart"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
@@ -28,14 +28,14 @@ const ProductItemCart: React.FC<ProductItemCartProps> = ({item}) => {
     e.stopPropagation();
     if (localQuantity > 1) {
       setLocalQuantity(localQuantity - 1);
-      modifyLocalCart(item.product._id, -1, item.size);
+      modifyLocalCart(item.product, item.product._id, -1, item.size);
     }
   };
 
   const handleIncreaseQuantity = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     setLocalQuantity(localQuantity + 1);
-    modifyLocalCart(item.product._id, 1, item.size);
+    modifyLocalCart( item.product, item.product._id, 1, item.size);
   };
 
   const handleChangeSize = async (e: React.ChangeEvent<HTMLSelectElement>) => {

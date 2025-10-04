@@ -1,4 +1,5 @@
 import api from "../lib/api";
+import {CartItem} from "@/types/cart";
 
 export interface ProductInCart {
     _id: string;
@@ -6,13 +7,6 @@ export interface ProductInCart {
     imageUrl: string[];
     price: number;
     size: string[];
-}
-
-export interface CartItem {
-    _id: string;
-    product: ProductInCart;
-    quantity: number;
-    size: string;
 }
 
 export interface Cart {

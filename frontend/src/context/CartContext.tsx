@@ -18,6 +18,7 @@ import {
 
 import { isAxiosError } from "@/utils/typeguards";
 import { BackendErrorResponse } from "@/types/api";
+import { CartItem } from "@/types/cart";
 
 export interface ProductInCart {
   _id: string;
@@ -27,12 +28,6 @@ export interface ProductInCart {
   size: string[];
 }
 
-export interface CartItem {
-  _id: string;
-  product: ProductInCart;
-  quantity: number;
-  size: string;
-}
 
 export interface CartContextType {
   cart: Cart | null;
@@ -50,8 +45,8 @@ export interface CartContextType {
     quantity: number,
     size: string
   ) => Promise<void>;
-  removeItem: (productId: string, size?: string) => Promise<void>;
-  modifyLocalCart: (productId: string, quantity: number, size?: string) => void;
+  // removeItem: (productId: string, size?: string) => Promise<void>;
+  modifyLocalCart: (product: ProductInCart, productId: string, quantity: number, size: string) => void;
   updateItemQuantityLocal: () => void;
   localCart: CartItem[];
   clearUserCart: () => Promise<void>;
@@ -71,7 +66,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [isLoadingCart, setIsLoadingCart] = useState(false);
   const [errorCart, setErrorCart] = useState<string | null>(null);
-  const [localCart, setLocalCart] = useState([]);
+  const [localCart, setLocalCart] = useState<CartItem[]>([]);
 
   const fetchUserCart = useCallback(async () => {
     if (authLoading) {
@@ -177,6 +172,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   };
 
   const modifyLocalCart = (
+    product: ProductInCart,
     productId: string,
     quantity: number,
     size: string
@@ -194,7 +190,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         );
       } else {
         // Se não existir, adiciona novo
-        return [...prevCart, { _id: productId, quantity, size }];
+        return [...prevCart, { _id: productId, product, quantity, price: product.price, size }];
       }
     });
   };
@@ -251,40 +247,40 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     setLocalCart([]);
   };
 
-  const removeItem = async (productId: string, size?: string) => {
-    if (!isAuthenticated) {
-      toast.error(
-        "Você precisa estar logado para remover produtos do carrinho."
-      );
-      return;
-    }
-    setIsLoadingCart(true);
-    try {
-      const response = await removeItem(productId, size);
-      setCart(response);
-      const itemsCount = response.items.reduce(
-        (total, item) => total + item.quantity,
-        0
-      );
-      const totalVal = response.items.reduce(
-        (total, item) => total + item.product.price * item.quantity,
-        0
-      );
-      setTotalItems(itemsCount);
-      setTotalPrice(totalVal);
-      toast.info("Produto removido do carrinho com sucesso!");
-    } catch (error: unknown) {
-      let errorMessage
-      if (isAxiosError(error)) {
-        errorMessage = error.response?.data as BackendErrorResponse;
-      }
-      toast.error(
-        errorMessage?.message || "Erro ao remover produto do carrinho."
-      );
-    } finally {
-      setIsLoadingCart(false);
-    }
-  };
+  // const removeItem = async (productId: string, size?: string) => {
+  //   if (!isAuthenticated) {
+  //     toast.error(
+  //       "Você precisa estar logado para remover produtos do carrinho."
+  //     );
+  //     return;
+  //   }
+  //   setIsLoadingCart(true);
+  //   try {
+  //     const response = await removeItem(productId, size);
+  //     // setCart(response);
+  //     const itemsCount = response.items.reduce(
+  //       (total, item) => total + item.quantity,
+  //       0
+  //     );
+  //     const totalVal = response.items.reduce(
+  //       (total, item) => total + item.product.price * item.quantity,
+  //       0
+  //     );
+  //     setTotalItems(itemsCount);
+  //     setTotalPrice(totalVal);
+  //     toast.info("Produto removido do carrinho com sucesso!");
+  //   } catch (error: unknown) {
+  //     let errorMessage
+  //     if (isAxiosError(error)) {
+  //       errorMessage = error.response?.data as BackendErrorResponse;
+  //     }
+  //     toast.error(
+  //       errorMessage?.message || "Erro ao remover produto do carrinho."
+  //     );
+  //   } finally {
+  //     setIsLoadingCart(false);
+  //   }
+  // };
 
   const clearUserCart = async () => {
     if (!isAuthenticated) {
@@ -317,7 +313,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     errorCart,
     addItem,
     updateItemQuantity,
-    removeItem,
     clearUserCart,
     modifyLocalCart,
     updateItemQuantityLocal,
