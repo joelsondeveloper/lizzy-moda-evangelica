@@ -24,7 +24,7 @@ export interface ProductFormData {
     price: number;
     size: string | string[];
     category: string;
-    currentImageUrl: string;
+    currentImageUrl?: string;
     inStock: boolean;
     imageFiles?: File[] | null;
     currentImageUrls?: string[] | null;
@@ -53,7 +53,9 @@ export const ALL_SIZES: string[] = [
   "XS", "S", "L", "XL", "XXL", "XXXL",
 ];
 
-export const getProducts = async (params?: ProductFilterParams): Promise<Product[]> => {
+type ProductsResponse = { products: Product[] };
+
+export const getProducts = async (params?: ProductFilterParams): Promise<ProductListResponse> => {
     const response = await api.get("/products", { params });
     return response.data;
 };

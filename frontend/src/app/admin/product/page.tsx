@@ -19,7 +19,7 @@ import {
 import { getCategories, Category } from "@/services/category";
 import SideForm from "@/components/layouts/layouts/SideForm";
 import Form from "@/components/layouts/layouts/Form";
-import { useForm } from "react-hook-form";
+import { useForm, UseFormSetValue, UseFormGetValues } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import HookFormInput from "@/components/layouts/ui/HookFormInput";
@@ -56,6 +56,11 @@ const productSchema = z.object({
 type ProductFormSchema = z.infer<typeof productSchema>;
 type ApiError = { response?: { data?: { message?: string } } };
 
+type ProductsResponse = { products: Product[] };
+
+type ProductFormImagesData = Pick<ProductFormSchema, "imageFiles" | "currentImageUrls">;
+
+
 const Page: React.FC = () => {
   const queryClient = useQueryClient();
 
@@ -69,15 +74,12 @@ const Page: React.FC = () => {
 
   const [searchTerm, setSearchTerm] = useState("");
 
-  const {
-    data: products,
-    isLoading,
-    isError,
-    error,
-  } = useQuery<Product[], Error>({
-    queryKey: ["adminProducts"],
-    queryFn: getProducts,
-  });
+  const { data: products, isLoading, isError, error } = useQuery<ProductsResponse, Error>({
+  queryKey: ["adminProducts"],
+  queryFn: () => getProducts(),
+});
+
+console.log("products", products); 
 
   const { data: categories } = useQuery<Category[], Error>({
     queryKey: ["adminCategories"],
@@ -413,15 +415,15 @@ const Page: React.FC = () => {
             <input type="checkbox" {...register("inStock")} />
             <span>Disponível em estoque</span>
           </div>
-          <ImageUploadField
-            label="Imagem do produto"
-            id="imageFile"
-            name="imageFiles"
-            rhfRegister={register("imageFiles")}
-            error={errors.imageFiles?.message}
-            setValue={setValue} // 🔑 obrigatórios
-            getValues={getValues} // 🔑 obrigatórios
-          />
+          <ImageUploadField<ProductFormData>
+  label="Imagem do produto"
+  id="imageFile"
+  name="imageFiles"
+  rhfRegister={register("imageFiles")}
+  error={errors.imageFiles?.message}
+  setValue={setValue}
+  getValues={getValues}
+/>
         </Form>
       </SideForm>
     </>
