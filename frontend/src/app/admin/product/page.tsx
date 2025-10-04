@@ -37,7 +37,10 @@ const productSchema = z.object({
     .min(10, "A descrição do produto deve ter pelo menos 10 caracteres.")
     .max(500, "A descrição do produto deve ter no máximo 500 caracteres."),
   price: z
-    .number({ invalid_type_error: "O preço do produto deve ser um número." })
+    .number()
+    .refine((val) => !isNaN(val), {
+      message: "O preço do produto deve ser um número.",
+    })
     .positive("O preço do produto deve ser maior que zero."),
   size: z.array(z.string()).min(1, "Selecione pelo menos um tamanho."),
   category: z.string().min(1, "Selecione uma categoria."),
