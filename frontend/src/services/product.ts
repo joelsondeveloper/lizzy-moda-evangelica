@@ -1,4 +1,4 @@
-import { boolean } from "zod";
+
 import api from "../lib/api";
 
 export interface Product {

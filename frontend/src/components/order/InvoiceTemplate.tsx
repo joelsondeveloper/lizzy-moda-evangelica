@@ -1,6 +1,6 @@
 "use client"
 import Image from "next/image"
-import { Order, orderStatuses } from "@/services/order"
+import { Order } from "@/services/order"
 
 interface InvoiceTemplateProps {
     order: Order

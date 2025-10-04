@@ -298,8 +298,12 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       setTotalItems(0);
       setTotalPrice(0);
       toast.info("Carrinho limpo com sucesso!");
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Erro ao limpar carrinho.");
+    } catch (error: unknown) {
+      let errorMessage
+      if (isAxiosError(error)) {
+        errorMessage = error.response?.data as BackendErrorResponse;
+      }
+      toast.error(errorMessage?.message || "Erro ao limpar carrinho.");
     } finally {
       setIsLoadingCart(false);
     }

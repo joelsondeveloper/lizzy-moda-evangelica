@@ -237,7 +237,7 @@ const handlePriceChange = (type: "min" | "max", value: string) => {
   }
 
   const products = productListResponse?.products || [];
-  const totalProductsCount = productListResponse?.totalProducts || 0;
+  // const totalProductsCount = productListResponse?.totalProducts || 0;
   // const productsPerPageFromResponse =
   //   productListResponse?.productPerPage || 12;
   // const totalPages = Math.ceil(

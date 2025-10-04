@@ -6,6 +6,7 @@ import Search from "@/components/layouts/ui/Search";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { useCallback } from "react";
 import { toast } from "react-toastify";
 import ConfirmationModal from "@/components/layouts/ui/ConfirmationModal";
 import {
@@ -56,11 +57,14 @@ const Page: React.FC = () => {
     defaultValues: { name: "" },
   });
 
-  const resetForm = (category?: Category | null) => {
+  const resetForm = useCallback(
+  (category?: Category | null) => {
     reset({
       name: category?.name ?? "",
     });
-  };
+  },
+  [reset]
+);
 
   useEffect(() => {
     resetForm(editingCategory);
