@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
 import Form from "@/components/layouts/layouts/Form";
 import Register from "@/components/layouts/ui/Register";
+import { useEffect } from "react";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -34,6 +35,8 @@ const Page = () => {
   const {
     register: authRegister,
     isLoading: authLoading,
+    isAuthenticated,
+    isAdmin,
   } = useAuth();
 
   const router = useRouter();
@@ -53,28 +56,31 @@ const Page = () => {
     },
   });
 
-  // useEffect(() => {
-  //   if (!authLoading && isAuthenticated) {
-  //     if (isAdmin) {
-  //       router.push("/admin");
-  //     } else {
-  //       router.push("/");
-  //     }
-  //   }
-  // }, [isAuthenticated, router, isAdmin, authLoading]);
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      if (isAdmin) {
+        router.push("/admin");
+      } else {
+        router.push("/");
+      }
+    }
+  }, [authLoading, isAuthenticated, isAdmin, router]);
 
   const onSubmit = async (data: RegisterFormSchema) => {
     setFormError("root", { message: "" });
 
     try {
-      await authRegister({
+      console.log("tentando cadastrar");
+      const response = await authRegister({
         name: data.name,
         email: data.email,
         password: data.password,
       });
+      console.log("cadastrado com sucesso", response);
       toast.success(
         "Usuário cadastrado com sucesso! Verifique seu email para ativar sua conta."
       );
+      console.log("redirecionando para /verify");
       router.push(`/verify?email=${encodeURIComponent(data.email)}`);
     } catch (err: unknown) {
       let errorMessage =
