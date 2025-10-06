@@ -1,17 +1,20 @@
 import VerifyForm from "./VerifyForm";
 
+type SearchParams = {
+  email?: string;
+};
+
 interface PageProps {
-  searchParams: {
-    email: string;
-  };
+  searchParams?: SearchParams | Promise<SearchParams>;
 }
 
-export default function Page({
+export default async function Page({
   searchParams,
 }: PageProps) {
 
-  // Pega o email se existir
-  const email = searchParams?.email ?? "";
+  const params = searchParams instanceof Promise ? await searchParams : searchParams;
+  
+  const email = params?.email ?? "";
 
   return <VerifyForm initialEmail={email} />;
 }
