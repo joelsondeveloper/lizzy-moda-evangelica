@@ -31,12 +31,10 @@ type Props = {
     initialEmail: string
 };
 
-export function Page ({searchParams}: {searchParams: { email: string }}) {
+export function VerifyForm ({initialEmail}: Props) {
   const router = useRouter();
 
   const { isAuthenticated, isAdmin, isLoading: authLoading, refetchUser } = useAuth();
-
-  const initialEmail = searchParams.email || "";
 
   const {
     register,
@@ -147,4 +145,4 @@ return (
 );
 };
 
-export default Page;
+export default VerifyForm;

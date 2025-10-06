@@ -6,6 +6,12 @@ interface PageProps {
   };
 }
 
-export default function Page({ searchParams }: PageProps) {
-  return <VerifyForm initialEmail={searchParams.email} />;
+export default function Page({
+  searchParams,
+}: PageProps) {
+
+  // Pega o email se existir
+  const email = searchParams?.email ?? "";
+
+  return <VerifyForm initialEmail={email} />;
 }
