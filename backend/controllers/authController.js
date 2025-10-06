@@ -1,6 +1,9 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
-const nodemailer = require("nodemailer");
+const sgMail = require("@sendgrid/mail");
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -9,37 +12,35 @@ const generateToken = (id) => {
 };
 
 const sendVerificationCode = async (email, code) => {
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
-
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
+  const msg = {
     to: email,
-    subject: "Código de verificação - Lizzy Moda Evangélica",
+    from: process.env.SENDGRID_FROM, // precisa ser um e-mail verificado no SendGrid
+    subject: "Código de verificação - Lizzy Moda Evangélica",
     html: `
-        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-            <h2 style="color: #8C2D4B;">Olá!</h2>
-            <p>Obrigado por se cadastrar na Lizzy Moda Evangélica.</p>
-            <p>Por favor, use o código abaixo para verificar seu email e ativar sua conta:</p>
-            <h3 style="color: #8C2D4B; font-size: 24px; text-align: center; border: 1px solid #eee; padding: 10px; border-radius: 5px;">
-                ${code}
-            </h3>
-            <p>Este código é válido por 15 minutos.</p>
-            <p>Se você não solicitou este código, por favor ignore este email.</p>
-            <p>Atenciosamente,</p>
-            <p>Equipe Lizzy Moda Evangélica</p>
-        </div>
-    `, // Melhor usar HTML
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <h2 style="color: #8C2D4B;">Olá!</h2>
+        <p>Obrigado por se cadastrar na Lizzy Moda Evangélica.</p>
+        <p>Por favor, use o código abaixo para verificar seu email e ativar sua conta:</p>
+        <h3 style="color: #8C2D4B; font-size: 24px; text-align: center; border: 1px solid #eee; padding: 10px; border-radius: 5px;">
+          ${code}
+        </h3>
+        <p>Este código é válido por 15 minutos.</p>
+        <p>Se você não solicitou este código, por favor ignore este email.</p>
+        <p>Atenciosamente,</p>
+        <p>Equipe Lizzy Moda Evangélica</p>
+      </div>
+    `,
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    await sgMail.send(msg);
+    console.log("Email enviado com sucesso para:", email);
+  } catch (error) {
+    console.error("Erro ao enviar email:", error);
+    if (error.response) {
+      console.error(error.response.body);
+    }
+  }
 };
 
 const registerUser = async (req, res) => {
