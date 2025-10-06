@@ -5,14 +5,14 @@ type SearchParams = {
 };
 
 interface PageProps {
-  searchParams?: SearchParams | Promise<SearchParams>;
+  searchParams?: Promise<SearchParams>;
 }
 
 export default async function Page({
   searchParams,
 }: PageProps) {
 
-  const params = searchParams instanceof Promise ? await searchParams : searchParams;
+  const params = searchParams ? await searchParams : {};
   
   const email = params?.email ?? "";
 
