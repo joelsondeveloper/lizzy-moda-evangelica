@@ -151,8 +151,8 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen }) => {
                 key={item.product._id}
               />
             ))}
-          </div>
-          <footer className="absolute bottom-0 left-0 w-full p-5 flex flex-col gap-2">
+          {cart && cart.items.length > 0 && (
+            <footer className="absolute bottom-0 left-0 w-full p-5 flex flex-col gap-2">
             <div className="total flex flex-col gap-2 px-2">
               <div className="item-count flex justify-between text-sm text-text-primary-light dark:text-text-primary-dark">
                 <p className="font-medium">Total de itens:</p>
@@ -180,6 +180,8 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen }) => {
               </p>
             </div>
           </footer>
+          )}
+          </div>
           {isOpenModal && (
             <ConfirmationModal
               isOpen={isOpenModal}

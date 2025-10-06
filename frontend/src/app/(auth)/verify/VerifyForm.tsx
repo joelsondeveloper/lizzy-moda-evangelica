@@ -19,11 +19,10 @@ import { useForm } from "react-hook-form";
 import { verifyUser } from "@/services/auth";
 
 const verificationSchema = z.object({
-  email: z.string().email("Email inválido"),
+  email: z.string().email("Email inválido"),
   code: z
     .string()
-    .min(7, "O código deve ter 7 caracteres")
-    .max(7, "O código deve ter 7 caracteres"),
+    .regex(/^\d{7}$/, "O código deve ter 7 números"),
 });
 
 type VerificationFormSchema = z.infer<typeof verificationSchema>;
@@ -32,12 +31,12 @@ type Props = {
     initialEmail: string
 };
 
-const Page: React.FC<Props> = ({initialEmail}) => {
+export function Page ({searchParams}: {searchParams: { email: string }}) {
   const router = useRouter();
-//   const searchParams = useSearchParams();
-//   const initialEmail = searchParams.get("email") || "";
 
   const { isAuthenticated, isAdmin, isLoading: authLoading, refetchUser } = useAuth();
+
+  const initialEmail = searchParams.email || "";
 
   const {
     register,
@@ -139,6 +138,7 @@ return (
       <Link
         href="/resend-verification"
         className="text-[var(--color-link-light)] dark:text-[var(--color-link-dark)] hover:underline font-medium"
+
       >
         Não recebeu o código? Reenviar
       </Link>
