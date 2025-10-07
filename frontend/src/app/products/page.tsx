@@ -12,10 +12,6 @@ type SearchParams = {
   limit?: string;
 };
 
-interface ProductsPageProps {
-  searchParams?: SearchParams;
-}
-
-export default function Page({ searchParams }: ProductsPageProps) {
+export default function Page({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
   return <PageClient searchParams={searchParams as SearchParams} />;
 }
