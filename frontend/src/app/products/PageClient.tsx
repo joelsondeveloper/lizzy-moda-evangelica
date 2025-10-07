@@ -30,6 +30,8 @@ interface PageClientProps {
 const Page: React.FC<PageClientProps> = ({ searchParams }) => {
   const router = useRouter();
 
+  searchParams = searchParams ? searchParams : {};
+
    const [searchTerm, setSearchTerm] = useState(searchParams.search || "");
   const [selectedCategory, setSelectedCategory] = useState(searchParams.category || "");
   const [minPrice, setMinPrice] = useState(searchParams.minPrice || "");
