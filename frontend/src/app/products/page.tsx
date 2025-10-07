@@ -16,6 +16,6 @@ interface ProductsPageProps {
   searchParams?: SearchParams;
 }
 
-export default function Page({ searchParams }: Record<string, string | string[] | undefined>) {
+export default function Page({ searchParams }: ProductsPageProps) {
   return <PageClient searchParams={searchParams as SearchParams} />;
 }
