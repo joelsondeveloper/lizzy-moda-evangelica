@@ -89,7 +89,7 @@ const Page: React.FC<PageClientProps> = ({ searchParams }) => {
     isError,
     error,
   } = useQuery<ProductListResponse, Error>({
-    queryKey: ["products", searchParams.toString()],
+    queryKey: ["products", JSON.stringify(searchParams)],
     queryFn: () => {
       const apiParams: ProductFilterParams = {
         search: searchTerm,
