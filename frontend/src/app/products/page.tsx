@@ -1,19 +1,19 @@
-// app/products/page.tsx (Server Component por padrão)
-
 import PageClient from "./PageClient";
 
-type PageProps = {
-  searchParams?: {
-    search?: string;
-    category?: string;
-    minPrice?: string;
-    maxPrice?: string;
-    size?: string;
-    page?: string;
-    limit?: string;
+export default function Page({
+  searchParams,
+}: {
+  searchParams?: Record<string, string | string[] | undefined>;
+}) {
+  const normalized = {
+    search: searchParams?.search as string | undefined,
+    category: searchParams?.category as string | undefined,
+    minPrice: searchParams?.minPrice as string | undefined,
+    maxPrice: searchParams?.maxPrice as string | undefined,
+    size: searchParams?.size as string | undefined,
+    page: searchParams?.page as string | undefined,
+    limit: searchParams?.limit as string | undefined,
   };
-};
 
-export default function Page({ searchParams }: PageProps) {
-  return <PageClient searchParams={searchParams ?? {}} />;
+  return <PageClient searchParams={normalized} />;
 }
