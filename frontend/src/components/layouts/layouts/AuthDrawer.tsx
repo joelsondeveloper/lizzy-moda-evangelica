@@ -39,16 +39,8 @@ const AuthDrawer = ({ setIsConfirming }: Props) => {
   const navLinksGuest = [
     {
       title: "Sobre a Lizzy Moda",
-      path: "/about"
-    },
-    {
-      title: "Contato",
-      path: "/support"
-    },
-    {
-      title: "Localização da Loja",
-      path: "/addresses"
-    },
+      path: "/contact",
+    }
   ];
 
   const router = useRouter();

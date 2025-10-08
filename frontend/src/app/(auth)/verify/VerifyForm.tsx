@@ -96,7 +96,7 @@ if (authLoading) {
 }
 
 return (
-  <section className="flex items-center justify-center py-12">
+  <section className="min-h-screen flex items-center justify-center p-4">
     <Form
       title="Verifique seu email"
       subtitle="Um código foi enviado para o seu email."
@@ -135,7 +135,7 @@ return (
       </div>
       <Link
         href="/resend-verification"
-        className="text-[var(--color-link-light)] dark:text-[var(--color-link-dark)] hover:underline font-medium"
+        className="block mt-4 text-center text-link-light dark:text-link-dark hover:underline font-medium text-sm sm:text-base"
 
       >
         Não recebeu o código? Reenviar
