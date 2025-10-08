@@ -44,8 +44,8 @@ const getProducts = async (req, res) => {
     } = req.query;
     let filter = {};
     let sort = {};
-    let queryLimit = limit ? parseInt(limit) : 6;
-    let skip = page ? (parseInt(page) - 1) * queryLimit : 0;
+    let queryLimit = limit && !isNaN(Number(limit)) ? Number(limit) : 6;
+    let skip = page && !isNaN(Number(page)) ? (Number(page) - 1) * queryLimit : 0;
 
     if (displayType === 'novidade') {
       filter = { inStock: true };
@@ -63,7 +63,7 @@ const getProducts = async (req, res) => {
       filter.category = categoryId;
     }
 
-    if (search) {
+    if (search && typeof search === "string" && search.trim().length > 0) {
       filter.$or = [
         { name: { $regex: search, $options: "i" } },
         { description: { $regex: search, $options: "i" } },
@@ -74,17 +74,20 @@ const getProducts = async (req, res) => {
       filter.category = categoryId;
     }
 
-    if (minPrice || maxPrice) {
+    const parsedMin = minPrice && !isNaN(Number(minPrice)) ? Number(minPrice) : undefined;
+    const parsedMax = maxPrice && !isNaN(Number(maxPrice)) ? Number(maxPrice) : undefined;
+    
+    if (parsedMin !== undefined || parsedMax !== undefined) {
       filter.price = {};
-      if (minPrice) {
-        filter.price.$gte = parseFloat(minPrice);
+      if (parsedMin !== undefined) {
+        filter.price.$gte = parsedMin;
       }
-      if (maxPrice) {
-        filter.price.$lte = parseFloat(maxPrice);
+      if (parsedMax !== undefined) {
+        filter.price.$lte = parsedMax;
       }
     }
 
-    if (size) {
+    if (size && typeof size === "string") {
       const sizesArray = size.split(",").map((s) => s.trim());
       if (sizesArray.length > 0) {
         filter.size = { $in: sizesArray };

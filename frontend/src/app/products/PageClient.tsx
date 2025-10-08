@@ -92,11 +92,11 @@ const Page: React.FC<PageClientProps> = ({ searchParams }) => {
     queryKey: ["products", JSON.stringify(searchParams)],
     queryFn: () => {
       const apiParams: ProductFilterParams = {
-        search: searchTerm,
-        categoryId: selectedCategory,
-        minPrice: parseFloat(minPrice),
-        maxPrice: parseFloat(maxPrice),
-        size: selectedSizes.join(","),
+        search: searchTerm || undefined,
+        categoryId: selectedCategory || undefined,
+        minPrice: minPrice && !isNaN(parseFloat(minPrice)) ? parseFloat(minPrice) : undefined,
+        maxPrice: maxPrice && !isNaN(parseFloat(maxPrice)) ? parseFloat(maxPrice) : undefined,
+        size: selectedSizes.length > 0 ? selectedSizes.join(",") : undefined,
         page: currentPage,
         limit: productsPerPage,
       };
