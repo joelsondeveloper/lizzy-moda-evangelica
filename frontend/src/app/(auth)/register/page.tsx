@@ -121,8 +121,7 @@ const Page = () => {
         isLoading={isSubmitting}
         otherWay={
           <>
-            <div className="mt-6 text-center text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-              <div className="relative flex items-center py-5"></div>
+            <div className=" text-center text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
               <Link
                 href={`${process.env.NEXT_PUBLIC_API_URL}/auth/google`}
                 className="w-full py-4 px-4 border border-[var(--color-border-light)] dark:border-[var(--color-border-dark)] rounded-md flex items-center justify-center space-x-2 bg-white dark:bg-gray-700 text-[var(--color-text-primary-light)] dark:text-[var(--color-text-primary-dark)] hover:bg-[var(--color-border-light)] dark:hover:bg-[var(--color-border-dark)] transition-colors"

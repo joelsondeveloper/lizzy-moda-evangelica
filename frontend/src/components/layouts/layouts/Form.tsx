@@ -29,7 +29,7 @@ const Form = ({
         isSideBar
           ? "top-1/2"
           : ""
-      } w-[clamp(18.75rem,80vw,30rem)] p-[clamp(1rem,4vw,3rem)] rounded-xl shadow-2xl bg-page-background-light dark:bg-page-background-dark`}
+      } w-[clamp(18.75rem,80vw,30rem)] p-[clamp(1rem,4vw,3rem)] rounded-xl shadow-md sm:shadow-xl lg:shadow-2xl bg-page-background-light dark:bg-page-background-dark`}
       onSubmit={(e) => {
         e.preventDefault();
         onSubmit();
@@ -47,12 +47,12 @@ const Form = ({
       >
         {textButton}
       </GeneralButton>
-      <div className="options relative flex items-center w-full">
+      {otherWay && <div className="options relative flex items-center w-full">
         <p className="mx-auto px-1 text-center bg-page-background-light dark:bg-page-background-dark z-1">
           ou
         </p>
         <div className="line h-1 w-full absolute border-b border-primary-accent-light dark:border-primary-accent-dark"></div>
-      </div>
+      </div>}
       {otherWay}
     </form>
   );
