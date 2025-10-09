@@ -29,7 +29,7 @@ const ProductGridSection = ({
     fetchProducts();
   }, [displayType, categoryId, limit]);
 
-   const gridClasses = `
+  const gridClasses = `
     grid-container w-full grid 
     grid-cols-1 
     sm:grid-cols-2 
@@ -79,15 +79,26 @@ const ProductGridSection = ({
         </div>
       ) : (
         <div
-          className={
-            products.length > 5
-              ? gridClasses
-              : "flex flex-row gap-[clamp(1rem,2vw,2rem)] flex-wrap justify-center w-full"
-          }
+          className={`
+        w-full
+        flex lg:grid
+        lg:grid-cols-4
+        gap-[clamp(1rem,2vw,2rem)]
+        overflow-x-auto
+        snap-x snap-mandatory
+        scroll-smooth
+        scrollbar-hide
+        px-2
+      `}
         >
           {products.length > 0 &&
             products.map((product: Product) => (
-              <ProductCard key={product._id} product={product} />
+              <div
+                key={product._id}
+                className="flex-shrink-0 w-[85%] sm:w-[45%] md:w-[33%] lg:w-auto snap-center"
+              >
+                <ProductCard product={product} />
+              </div>
             ))}
         </div>
       )}
