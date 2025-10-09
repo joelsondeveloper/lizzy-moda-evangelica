@@ -21,7 +21,7 @@ const ProductCard = ({ product }: { product: Product }) => {
 
   return (
   <article
-    className="rounded-xl overflow-hidden flex flex-col cursor-pointer w-full max-w-[20rem] transition-transform duration-300 hover:scale-[1.02]"
+    className="rounded-xl overflow-hidden flex flex-col cursor-pointer w-full max-w-[20rem] transition-transform duration-300"
     onClick={handleProductClick}
     onMouseEnter={() => setIsHovered(true)}
     onMouseLeave={() => setIsHovered(false)}
