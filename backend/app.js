@@ -21,10 +21,16 @@ require('./config/passport');
 
 const app = express();
 
-console.log(process.env.FRONTEND_URL);
+const allowedOrigins = [process.env.FRONTEND_URL, 'http://localhost:3000'];
 
 const corsOptions = {
-    origin: process.env.FRONTEND_URL, 
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    }, 
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
