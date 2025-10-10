@@ -68,7 +68,7 @@ const Header = ({ sideDrawer }: { sideDrawer: (side: sideProps) => void }) => {
   return (
     <header className="px-[clamp(1rem,5vw,5rem)] py-4 gap-4 flex flex-col fixed w-full backdrop-blur-sm z-2">
       <div className="header-top flex items-center justify-between gap-4">
-        <div className="logo-section flex gap-4 flex-shrink-0">
+        <div className="logo-section flex gap-4 flex-shrink-0 cursor-pointer" onClick={() => router.push("/")}>
           <div className="image-container relative w-12 h-12 border rounded-full">
             <Image
               src="/logo.png"

@@ -3,28 +3,30 @@ const Category = require("../models/Category");
 const cloudinary = require("../config/cloudinary");
 const mongoose = require("mongoose");
 
-const  extractPublicId = (imageUrl) => {
-  if (!imageUrl || typeof imageUrl !== 'string' || !imageUrl.includes('/upload/')) {
+const extractPublicId = (imageUrl) => {
+  if (
+    !imageUrl ||
+    typeof imageUrl !== "string" ||
+    !imageUrl.includes("/upload/")
+  ) {
     return null;
   }
-  const urlParts = imageUrl.split('/upload/');
+  const urlParts = imageUrl.split("/upload/");
   if (urlParts.length > 1 && urlParts[1]) {
-    return urlParts[1]
-      .replace(/^v\d+\//, '')
-      .replace(/\.[^/.]+$/, '');
+    return urlParts[1].replace(/^v\d+\//, "").replace(/\.[^/.]+$/, "");
   }
   return null;
 };
 
 const normalizeSizes = (size) => {
   if (!size) return [];
-  if (Array.isArray(size)) return size.map(s => s.trim());
+  if (Array.isArray(size)) return size.map((s) => s.trim());
   if (typeof size === "string") {
     try {
       const parsed = JSON.parse(size);
-      if (Array.isArray(parsed)) return parsed.map(s => s.trim());
+      if (Array.isArray(parsed)) return parsed.map((s) => s.trim());
     } catch (e) {
-      return size.split(",").map(s => s.trim());
+      return size.split(",").map((s) => s.trim());
     }
   }
   return [];
@@ -40,23 +42,24 @@ const getProducts = async (req, res) => {
       maxPrice,
       size,
       page,
-      limit
+      limit,
     } = req.query;
     let filter = {};
     let sort = {};
     let queryLimit = limit && !isNaN(Number(limit)) ? Number(limit) : 6;
-    let skip = page && !isNaN(Number(page)) ? (Number(page) - 1) * queryLimit : 0;
+    let skip =
+      page && !isNaN(Number(page)) ? (Number(page) - 1) * queryLimit : 0;
 
-    if (displayType === 'novidade') {
+    if (displayType === "novidade") {
       filter = { inStock: true };
       sort = { createdAt: -1 };
-    } else if (displayType === 'destaque') {
+    } else if (displayType === "destaque") {
       filter = { inStock: true };
       sort = { createdAt: -1 };
-    } else if (displayType === 'promocao') {
+    } else if (displayType === "promocao") {
       filter = { inStock: true };
       sort = { price: 1 };
-    } else if (displayType === 'categoria' && categoryId) {
+    } else if (displayType === "categoria" && categoryId) {
       if (!mongoose.Types.ObjectId.isValid(categoryId)) {
         return res.status(400).json({ message: "Categoria invalida" });
       }
@@ -70,13 +73,19 @@ const getProducts = async (req, res) => {
       ];
     }
 
-    if (!displayType && categoryId && mongoose.Types.ObjectId.isValid(categoryId)) {
+    if (
+      !displayType &&
+      categoryId &&
+      mongoose.Types.ObjectId.isValid(categoryId)
+    ) {
       filter.category = categoryId;
     }
 
-    const parsedMin = minPrice && !isNaN(Number(minPrice)) ? Number(minPrice) : undefined;
-    const parsedMax = maxPrice && !isNaN(Number(maxPrice)) ? Number(maxPrice) : undefined;
-    
+    const parsedMin =
+      minPrice && !isNaN(Number(minPrice)) ? Number(minPrice) : undefined;
+    const parsedMax =
+      maxPrice && !isNaN(Number(maxPrice)) ? Number(maxPrice) : undefined;
+
     if (parsedMin !== undefined || parsedMax !== undefined) {
       filter.price = {};
       if (parsedMin !== undefined) {
@@ -94,14 +103,18 @@ const getProducts = async (req, res) => {
       }
     }
 
-      filter.inStock = true
-      
-      let productQuery = Product.find(filter);
+    filter.inStock = true;
+
+    console.log("🧩 Filtro aplicado:", filter);
+    console.log("🧠 displayType:", displayType);
+    console.log("🆔 categoryId:", categoryId);
+
+    let productQuery = Product.find(filter);
 
     if (Object.keys(sort).length > 0) {
       productQuery = productQuery.sort(sort);
     } else {
-    productQuery = productQuery.sort({ createdAt: -1 })
+      productQuery = productQuery.sort({ createdAt: -1 });
     }
 
     const totalProducts = await Product.countDocuments(filter);
@@ -109,10 +122,12 @@ const getProducts = async (req, res) => {
     productQuery = productQuery.skip(skip).limit(queryLimit);
 
     const products = await productQuery.populate("category", "name");
-    res.json({products, totalProducts, productPerPage: queryLimit});
+    res.json({ products, totalProducts, productPerPage: queryLimit });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Erro ao buscar produtos", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Erro ao buscar produtos", error: error.message });
   }
 };
 
@@ -188,7 +203,9 @@ const updateProduct = async (req, res) => {
   try {
     const { name, description, price, size, category, inStock } = req.body;
 
-    const currentImageUrlsToKeep = req.body.currentImageUrls ? JSON.parse(req.body.currentImageUrls) : [];
+    const currentImageUrlsToKeep = req.body.currentImageUrls
+      ? JSON.parse(req.body.currentImageUrls)
+      : [];
 
     const product = await Product.findById(req.params.id);
 
@@ -215,17 +232,17 @@ const updateProduct = async (req, res) => {
 
     for (const oldUrl of product.imageUrl) {
       if (!finalImageUrls.includes(oldUrl)) {
-          const publicId = extractPublicId(oldUrl);
-          if (publicId) {
-            try {
-              await cloudinary.uploader.destroy(publicId);
-            } catch (error) {
-              console.error("Erro ao excluir imagem da Cloudinary:", error);
-              return res
-                .status(500)
-                .json({ message: "Erro ao excluir imagem da Cloudinary" });
-            }
+        const publicId = extractPublicId(oldUrl);
+        if (publicId) {
+          try {
+            await cloudinary.uploader.destroy(publicId);
+          } catch (error) {
+            console.error("Erro ao excluir imagem da Cloudinary:", error);
+            return res
+              .status(500)
+              .json({ message: "Erro ao excluir imagem da Cloudinary" });
           }
+        }
       }
     }
 
@@ -251,7 +268,7 @@ const updateProduct = async (req, res) => {
     product.price = price !== undefined ? price : product.price;
 
     if (size !== undefined) {
-      product.size = normalizeSizes(size)
+      product.size = normalizeSizes(size);
     }
 
     product.inStock = inStock !== undefined ? inStock : product.inStock;
@@ -274,7 +291,11 @@ const deleteProduct = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: "Produto nao encontrado" });
     }
-    if (product.imageUrl && Array.isArray(product.imageUrl) && product.imageUrl.length > 0) {
+    if (
+      product.imageUrl &&
+      Array.isArray(product.imageUrl) &&
+      product.imageUrl.length > 0
+    ) {
       for (const imageUrl of product.imageUrl) {
         const publicId = extractPublicId(imageUrl);
         if (publicId) {
