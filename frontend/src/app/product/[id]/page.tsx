@@ -97,18 +97,18 @@ const Page = () => {
 
   return (
     <section className="p-[clamp(1rem,2vw,2.5rem)] gap-[clamp(1rem,3vw,3.75rem)] flex flex-col md:flex-row justify-center items-center md:items-start ">
-      <div className="gallery max-w-130 flex gap-5">
-        <div className="thumbnail flex flex-col gap-3">
+      <div className="gallery w-min md:max-w-130 flex flex-col-reverse md:flex-row gap-4 mx-auto md:mx-0">
+        <div className="thumbnail flex md:flex-col gap-4 w-min md:max-w-130">
           {product.imageUrl.map((imageUrl, index) => (
             <div
               key={index}
-              className="img-container relative w-[clamp(3rem,calc(3rem+2rem*((100vw-20rem)/60rem)),5rem)] aspect-square"
+              className="img-container relative flex-shrink-0 w-[clamp(3rem,calc(3rem+2rem*((100vw-20rem)/60rem)),5rem)] aspect-square rounded-lg"
             >
               <Image
                 src={imageUrl}
                 alt={`Imagem ${index + 1}`}
                 fill
-                className="thumbnail-image cursor-pointer hover:scale-105 transition duration-300"
+                className={`thumbnail-image cursor-pointer object-cover hover:scale-105 transition-transform duration-300 rounded-lg ${index === mainImageIndex ? "border-2 border-primary-accent-light dark:border-primary-accent-dark" : ""}`}
                 onClick={() => setMainImageIndex(index)}
                 sizes="100%"
               />
@@ -116,8 +116,8 @@ const Page = () => {
           ))}
         </div>
         <div
-          className="mainImage relative w-[clamp(20rem,calc(20rem+11.25rem*((100vw-20rem)/60rem)),31.25rem)]
-           aspect-square"
+          className="mainImage relative w-full md:w-[clamp(20rem,calc(20rem+11.25rem*((100vw-20rem)/60rem)),31.25rem)]
+           aspect-square rounded-xl overflow-hidden"
           ref={imageContainerRef}
           onMouseMove={handleMouseMove}
           onMouseEnter={handleMouseEnter}
@@ -130,22 +130,10 @@ const Page = () => {
             transition: "background-size 0.3s ease",
           }}
         >
-          {product.imageUrl[mainImageIndex] &&
-            product.imageUrl.map((imageUrl, index) => (
-              <Image
-                key={index}
-                src={imageUrl}
-                alt={product.name}
-                fill
-                sizes="100%"
-                priority={index === mainImageIndex}
-                className="hidden"
-              />
-            ))}
         </div>
       </div>
-      <div className="info flex flex-col flex-1 max-w-130 justify-center items-center gap-6">
-        <header className="text-center">
+      <div className="info flex flex-col flex-1 max-w-130 justify-center items-center gap-6 text-center md:text-left">
+        <header>
           <h2 className="font-playfair text-3xl font-bold text-text-primary-light dark:text-text-primary-dark">
             {product.name}
           </h2>
@@ -162,7 +150,7 @@ const Page = () => {
           <p className="font-semibold text-text-primary-light dark:text-text-primary-dark">
             Descrição:
           </p>
-          <p className="text-text-secondary-light dark:text-text-secondary-dark">
+          <p className="text-text-secondary-light dark:text-text-secondary-dark text-justify md:text-left">
             {product.description}
           </p>
         </div>
@@ -170,7 +158,7 @@ const Page = () => {
           <p className="font-semibold text-text-primary-light dark:text-text-primary-dark">
             Escolha os tamanhos:
           </p>
-          <div className="size-container flex gap-4 w-full">
+          <div className="size-container flex gap-4 w-min mx-auto md:mx-0">
             <div className="buttons flex gap-3">
               {product.size.map((size) => (
                 <input
