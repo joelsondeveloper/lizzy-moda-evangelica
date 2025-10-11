@@ -55,13 +55,9 @@ const ImageUploadField = <TFieldValues extends FieldValues>({
 
   const errorMessage = typeof error === "string" ? error : error?.message;
 
-  const currentImageUrlsFromRHF = useMemo(() => {
-    return (getValues("currentImageUrls" as Path<TFieldValues>) as string[] | null) || [];
-  }, [getValues]);
+  const currentImageUrlsFromRHF = (getValues("currentImageUrls" as Path<TFieldValues>) as string[]) || [];
+const imageFilesFromRHF = (getValues("imageFiles" as Path<TFieldValues>) as File[]) || [];
 
-  const imageFilesFromRHF = useMemo(() => {
-    return (getValues("imageFiles" as Path<TFieldValues>) as File[] | null) || [];
-  }, [getValues]);
 
   // useEffect(() => {
   //   console.log(
@@ -78,24 +74,18 @@ const ImageUploadField = <TFieldValues extends FieldValues>({
   const objectUrlsRef = useRef<string[]>([]);
 
   useEffect(() => {
-
-    objectUrlsRef.current.forEach(URL.revokeObjectURL);
-    objectUrlsRef.current = []
-
-    if (imageFilesFromRHF && imageFilesFromRHF.length > 0) {
-      const urls = imageFilesFromRHF.map((file) => URL.createObjectURL(file));
-      objectUrlsRef.current = urls
-
-      setPreviews(urls);
-      return () => {
-        objectUrlsRef.current.forEach(URL.revokeObjectURL);
-      };
-    } else {
-      if (previews.length > 0) {
-        setPreviews([]);
-      }
+  if (imageFilesFromRHF && imageFilesFromRHF.length > 0) {
+    const urls = imageFilesFromRHF.map((file) => URL.createObjectURL(file));
+    setPreviews(urls);
+    return () => {
+      objectUrlsRef.current.forEach(URL.revokeObjectURL);
+    };
+  } else {
+    if (previews.length > 0) {
+      setPreviews([]);
     }
-  }, [imageFilesFromRHF]);
+  }
+}, [imageFilesFromRHF]);
 
   const handleFileChange = useCallback(
     (files: FileList | null) => {

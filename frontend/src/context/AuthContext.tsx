@@ -16,7 +16,7 @@ interface AuthContextType {
     user: User | null;
     isLoading: boolean;
     login: (credentials: LoginCredentials) => Promise<void>;
-    register: (data: RegisterData) => Promise<User>;
+    register: (data: RegisterData) => Promise<void>;
     logout: () => void;
     isAuthenticated: boolean;
     isAdmin: boolean;
@@ -81,12 +81,12 @@ const login = async (credentials: LoginCredentials) => {
 const register = async (data: RegisterData) => {
     setIsLoading(true);
     try {
-        const response = await registerUser(data);
+        await registerUser(data);
         setUser(null);
         setIsAuthenticated(false);
         setIsUserVerified(false);
         setIsAdmin(false);
-        return response;
+        return Promise.resolve();
     } catch (error) {
         setUser(null);
         setIsAuthenticated(false);

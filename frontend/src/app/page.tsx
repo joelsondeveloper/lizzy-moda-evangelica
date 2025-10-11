@@ -10,15 +10,16 @@ export default async function Home() {
   ]
 
   const categories = await getCategories();
+  console.log(categories);
   const conjuntosId = categories.find(
-    (category) => category.name === "conjuntos"
+    (category) => category.name === "Conjuntos"
   )?._id;
 
   return (
     <main>
       <BannerHome images={imagesBanner} />
       <ProductGridSection title="ultimos produtos" description="veja os produtos mais recentes" displayType="novidade" limit={6}  />
-      <ProductGridSection title="Melhores Conjuntos" description="veja os melhores Conjuntos disponiveis" displayType="categoria" categoryId={conjuntosId || ""} limit={6}  />
+      {conjuntosId && <ProductGridSection title="conjuntos" description="veja os produtos mais recentes" displayType="categoria" categoryId={conjuntosId} limit={6} />}
     </main>
   );
 }
