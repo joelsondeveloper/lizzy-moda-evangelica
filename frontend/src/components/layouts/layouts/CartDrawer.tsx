@@ -62,7 +62,11 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen }) => {
         updateItemQuantityLocal();
         const response = await createOrder();
         await clearUserCart();
-        router.push(`/orders/${response._id}`);
+        if (response.whatsappLink) {
+          window.open(response.whatsappLink, "_blank");
+        } else {
+          toast.error("Erro ao gerar o link do WhatsApp.");
+        }
       } catch (error) {
         console.error("Erro ao criar pedido:", error);
       }
@@ -152,7 +156,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen }) => {
               />
             ))}
           {cart && cart.items.length > 0 && (
-            <footer className="absolute bottom-0 left-0 w-full p-5 flex flex-col gap-2">
+            <footer className="sticky bottom-0 left-0 w-full p-5 flex flex-col gap-2 bg-page-background-light dark:bg-page-background-dark">
             <div className="total flex flex-col gap-2 px-2">
               <div className="item-count flex justify-between text-sm text-text-primary-light dark:text-text-primary-dark">
                 <p className="font-medium">Total de itens:</p>

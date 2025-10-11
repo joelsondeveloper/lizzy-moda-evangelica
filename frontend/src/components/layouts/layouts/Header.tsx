@@ -66,7 +66,7 @@ const Header = ({ sideDrawer }: { sideDrawer: (side: sideProps) => void }) => {
   };
 
   return (
-    <header className="px-[clamp(1rem,5vw,5rem)] py-4 gap-4 flex flex-col fixed w-full backdrop-blur-sm z-2">
+    <header className="px-[clamp(1rem,5vw,5rem)] pt-4 gap-4 flex flex-col fixed w-full backdrop-blur-sm z-2">
       <div className="header-top flex items-center justify-between gap-4">
         <div className="logo-section flex gap-4 flex-shrink-0 cursor-pointer" onClick={() => router.push("/")}>
           <div className="image-container relative w-12 h-12 border rounded-full">
@@ -101,11 +101,11 @@ const Header = ({ sideDrawer }: { sideDrawer: (side: sideProps) => void }) => {
           </NavButton>
         </div>
       </div>
-      <nav className="overflow-hidden">
+      <nav className="overflow-x-auto scrollbar-hide">
         <ul className="flex gap-12 justify-center mx-auto w-max ">
           {navLinks.map((link, index) => (
             <li
-              className="font-medium text-primary-accent-light dark:text-primary-accent-dark"
+              className="font-medium text-primary-accent-light dark:text-primary-accent-dark py-2 border-b-2 border-transparent hover:border-primary-accent-light dark:hover:border-primary-accent-dark transition duration-300 ease-in-out"
               key={index}
             >
               <Link href={link.path}>{link.title}</Link>

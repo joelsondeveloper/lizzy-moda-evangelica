@@ -71,17 +71,27 @@ const createOrder = async (req, res) => {
       });
     }
 
-    const message = cart.items
-      .map((item) => {
-        const productName = item.product
-          ? item.product.name
-          : "Produto Desconhecido";
-        const itemPrice = item.product ? item.product.price : 0;
-        return `${item.quantity}x ${productName} (Tamanho: ${
-          item.size || "N/A"
-        }) - R$${(itemPrice * item.quantity).toFixed(2)}`;
-      })
-      .join("\n");
+    const message = `🛍️ *Novo Pedido Recebido!*
+-----------------------------------
+${cart.items
+  .map((item) => {
+    const productName = item.product
+      ? item.product.name
+      : "Produto Desconhecido";
+    const itemPrice = item.product ? item.product.price : 0;
+    const size = item.size || "N/A";
+    return `• *${item.quantity}x* ${productName}  
+  ↳ Tamanho: ${size}  
+  ↳ Subtotal: R$${(itemPrice * item.quantity).toFixed(2)}`;
+  })
+  .join("\n\n")}
+-----------------------------------
+💰 *Total:* R$${totalPrice.toFixed(2)}
+📦 *Cliente:* ${req.user?.name || "Usuário não identificado"}
+📱 *Telefone:* ${req.user?.phone || "Não informado"}
+-----------------------------------
+Envie esta mensagem para confirmar o pedido. 🙌`;
+
 
     const order = await Order.create({
       user: req.user._id,

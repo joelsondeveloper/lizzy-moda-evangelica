@@ -21,6 +21,7 @@ export interface Order {
     items: OrderItem[];
     totalPrice: number;
     status: "pendente" | "confirmado" | "cancelado";
+    whatsappLink: string;
     createdAt: string;
     updatedAt: string;
 }
