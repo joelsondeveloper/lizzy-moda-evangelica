@@ -1,10 +1,10 @@
 import { Category, getCategories } from '@/services/category'
 import { useAuth } from '@/context/AuthContext';
-
-const { isLoading } = useAuth();
 const CategoriesGridSection = async () => {
 
     const categories = await getCategories();
+
+    const isLoading = !categories;
 
 
     const gridClasses = `
